@@ -9,7 +9,6 @@ export interface InventoryItem {
   category: ExpenseCategory;
   status: InventoryStatus;
   lastPurchasedAt: string | null;
-  averageConsumptionDays: number | null;
   nextPurchaseDate: string | null;
   createdAt: string;
   updatedAt: string;
@@ -20,7 +19,6 @@ export interface CreateInventoryInput {
   category: ExpenseCategory;
   status?: InventoryStatus;
   lastPurchasedAt?: string;
-  averageConsumptionDays?: number;
 }
 
 export interface UpdateInventoryInput {
@@ -28,5 +26,4 @@ export interface UpdateInventoryInput {
   category?: ExpenseCategory;
   status?: InventoryStatus;
   lastPurchasedAt?: string;
-  averageConsumptionDays?: number;
 }

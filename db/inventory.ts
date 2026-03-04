@@ -2,6 +2,8 @@ import * as SQLite from "expo-sqlite";
 import { generateId } from "../utils/id";
 import { format, addDays } from "date-fns";
 import type { InventoryItem, CreateInventoryInput, UpdateInventoryInput } from "../types/inventory";
+import { calculateStatus } from "../utils/inventoryStatus";
+import { getLatestExpenseByInventoryId } from "./expenses";
 
 function rowToInventoryItem(row: Record<string, unknown>): InventoryItem {
   return {
@@ -10,7 +12,6 @@ function rowToInventoryItem(row: Record<string, unknown>): InventoryItem {
     category: row.category as InventoryItem["category"],
     status: row.status as InventoryItem["status"],
     lastPurchasedAt: (row.last_purchased_at as string) || null,
-    averageConsumptionDays: (row.average_consumption_days as number) ?? null,
     nextPurchaseDate: (row.next_purchase_date as string) || null,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
@@ -23,19 +24,13 @@ export async function createInventoryItem(
 ): Promise<InventoryItem> {
   const id = generateId();
   const now = new Date().toISOString();
-  const status = input.status || "sufficient";
   const lastPurchasedAt = input.lastPurchasedAt || null;
-  const avgDays = input.averageConsumptionDays ?? null;
-
-  let nextPurchaseDate: string | null = null;
-  if (lastPurchasedAt && avgDays) {
-    nextPurchaseDate = format(addDays(new Date(lastPurchasedAt), avgDays), "yyyy-MM-dd");
-  }
+  const status: InventoryItem["status"] = input.status || "sufficient";
 
   await db.runAsync(
     `INSERT INTO inventory (id, item_name, category, status, last_purchased_at, average_consumption_days, next_purchase_date, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [id, input.itemName, input.category, status, lastPurchasedAt, avgDays, nextPurchaseDate, now, now]
+    [id, input.itemName, input.category, status, lastPurchasedAt, null, null, now, now]
   );
 
   return {
@@ -44,8 +39,7 @@ export async function createInventoryItem(
     category: input.category,
     status,
     lastPurchasedAt,
-    averageConsumptionDays: avgDays,
-    nextPurchaseDate,
+    nextPurchaseDate: null,
     createdAt: now,
     updatedAt: now,
   };
@@ -93,24 +87,8 @@ export async function updateInventoryItem(
     fields.push("last_purchased_at = ?");
     values.push(input.lastPurchasedAt);
   }
-  if (input.averageConsumptionDays !== undefined) {
-    fields.push("average_consumption_days = ?");
-    values.push(input.averageConsumptionDays);
-  }
 
   if (fields.length === 0) return null;
-
-  // Recalculate next_purchase_date if relevant fields changed
-  const current = await getInventoryItemById(db, id);
-  if (!current) return null;
-
-  const lastPurchased = input.lastPurchasedAt ?? current.lastPurchasedAt;
-  const avgDays = input.averageConsumptionDays ?? current.averageConsumptionDays;
-
-  if (lastPurchased && avgDays) {
-    fields.push("next_purchase_date = ?");
-    values.push(format(addDays(new Date(lastPurchased), avgDays), "yyyy-MM-dd"));
-  }
 
   const now = new Date().toISOString();
   fields.push("updated_at = ?");
@@ -138,16 +116,21 @@ export async function updateStatusFromPurchase(
   const current = await getInventoryItemById(db, id);
   if (!current) return null;
 
-  const avgDays = current.averageConsumptionDays;
+  const latestExpense = await getLatestExpenseByInventoryId(db, id);
+  const reminderDays = latestExpense?.reminderDays ?? null;
+
   let nextPurchaseDate: string | null = null;
-  if (avgDays) {
-    nextPurchaseDate = format(addDays(new Date(purchaseDate), avgDays), "yyyy-MM-dd");
+  let status: InventoryItem["status"] = "sufficient";
+
+  if (reminderDays) {
+    nextPurchaseDate = format(addDays(new Date(purchaseDate), reminderDays), "yyyy-MM-dd");
+    status = calculateStatus(purchaseDate, reminderDays);
   }
 
   const now = new Date().toISOString();
   await db.runAsync(
-    `UPDATE inventory SET status = 'sufficient', last_purchased_at = ?, next_purchase_date = ?, updated_at = ? WHERE id = ?`,
-    [purchaseDate, nextPurchaseDate, now, id]
+    `UPDATE inventory SET status = ?, last_purchased_at = ?, next_purchase_date = ?, updated_at = ? WHERE id = ?`,
+    [status, purchaseDate, nextPurchaseDate, now, id]
   );
 
   return getInventoryItemById(db, id);

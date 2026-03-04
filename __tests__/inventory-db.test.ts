@@ -49,30 +49,6 @@ describe("createInventoryItem", () => {
     expect(result.itemName).toBe("ロイヤルカナン");
     expect(result.category).toBe("food");
     expect(result.status).toBe("sufficient");
-  });
-
-  it("lastPurchasedAtとavgDaysからnextPurchaseDateを計算する", async () => {
-    mockRunAsync.mockResolvedValue({ changes: 1 });
-
-    const result = await createInventoryItem(db, {
-      itemName: "猫砂",
-      category: "litter",
-      lastPurchasedAt: "2026-03-01",
-      averageConsumptionDays: 30,
-    });
-
-    expect(result.nextPurchaseDate).toBe("2026-03-31");
-  });
-
-  it("avgDaysがなければnextPurchaseDateはnull", async () => {
-    mockRunAsync.mockResolvedValue({ changes: 1 });
-
-    const result = await createInventoryItem(db, {
-      itemName: "猫砂",
-      category: "litter",
-      lastPurchasedAt: "2026-03-01",
-    });
-
     expect(result.nextPurchaseDate).toBeNull();
   });
 });
@@ -106,7 +82,7 @@ describe("getInventoryItems", () => {
     const result = await getInventoryItems(db);
     expect(result).toHaveLength(1);
     expect(result[0].itemName).toBe("ロイヤルカナン");
-    expect(result[0].averageConsumptionDays).toBe(30);
+    expect(result[0].nextPurchaseDate).toBe("2026-03-31");
   });
 });
 
@@ -118,8 +94,8 @@ describe("updateInventoryItem", () => {
       category: "food",
       status: "low",
       last_purchased_at: "2026-03-01",
-      average_consumption_days: 30,
-      next_purchase_date: "2026-03-31",
+      average_consumption_days: null,
+      next_purchase_date: null,
       created_at: "2026-03-01T00:00:00Z",
       updated_at: "2026-03-01T00:00:00Z",
     });
@@ -154,25 +130,92 @@ describe("deleteInventoryItem", () => {
 });
 
 describe("updateStatusFromPurchase", () => {
-  it("ステータスをsufficientにリセットする", async () => {
-    mockGetFirstAsync.mockResolvedValue({
-      id: "test-id",
-      item_name: "ロイヤルカナン",
-      category: "food",
-      status: "critical",
-      last_purchased_at: "2026-02-01",
-      average_consumption_days: 30,
-      next_purchase_date: "2026-03-03",
-      created_at: "2026-02-01T00:00:00Z",
-      updated_at: "2026-02-01T00:00:00Z",
-    });
+  it("紐づく支出のreminder_daysからステータスを計算する", async () => {
+    // getInventoryItemById
+    mockGetFirstAsync
+      .mockResolvedValueOnce({
+        id: "test-id",
+        item_name: "ロイヤルカナン",
+        category: "food",
+        status: "critical",
+        last_purchased_at: "2026-02-01",
+        average_consumption_days: null,
+        next_purchase_date: null,
+        created_at: "2026-02-01T00:00:00Z",
+        updated_at: "2026-02-01T00:00:00Z",
+      })
+      // getLatestExpenseByInventoryId
+      .mockResolvedValueOnce({
+        id: "exp-1",
+        category: "food",
+        amount: 3000,
+        item_name: "ロイヤルカナン",
+        expense_date: "2026-03-01",
+        memo: "",
+        inventory_id: "test-id",
+        reminder_days: 30,
+        notification_id: null,
+        created_at: "2026-03-01T00:00:00Z",
+        updated_at: "2026-03-01T00:00:00Z",
+      })
+      // getInventoryItemById (return after update)
+      .mockResolvedValueOnce({
+        id: "test-id",
+        item_name: "ロイヤルカナン",
+        category: "food",
+        status: "sufficient",
+        last_purchased_at: "2026-03-01",
+        average_consumption_days: null,
+        next_purchase_date: "2026-03-31",
+        created_at: "2026-02-01T00:00:00Z",
+        updated_at: "2026-03-01T00:00:00Z",
+      });
     mockRunAsync.mockResolvedValue({ changes: 1 });
 
     await updateStatusFromPurchase(db, "test-id", "2026-03-01");
 
     const sql = mockRunAsync.mock.calls[0][0] as string;
-    expect(sql).toContain("status = 'sufficient'");
+    expect(sql).toContain("status = ?");
     expect(sql).toContain("last_purchased_at = ?");
+    const params = mockRunAsync.mock.calls[0][1] as unknown[];
+    expect(params[0]).toBe("sufficient");
+  });
+
+  it("reminder_daysがnullの場合はsufficient、nextPurchaseDate=null", async () => {
+    // getInventoryItemById
+    mockGetFirstAsync
+      .mockResolvedValueOnce({
+        id: "test-id",
+        item_name: "ロイヤルカナン",
+        category: "food",
+        status: "critical",
+        last_purchased_at: "2026-02-01",
+        average_consumption_days: null,
+        next_purchase_date: null,
+        created_at: "2026-02-01T00:00:00Z",
+        updated_at: "2026-02-01T00:00:00Z",
+      })
+      // getLatestExpenseByInventoryId → no expense with reminder_days
+      .mockResolvedValueOnce(null)
+      // getInventoryItemById (return after update)
+      .mockResolvedValueOnce({
+        id: "test-id",
+        item_name: "ロイヤルカナン",
+        category: "food",
+        status: "sufficient",
+        last_purchased_at: "2026-03-01",
+        average_consumption_days: null,
+        next_purchase_date: null,
+        created_at: "2026-02-01T00:00:00Z",
+        updated_at: "2026-03-01T00:00:00Z",
+      });
+    mockRunAsync.mockResolvedValue({ changes: 1 });
+
+    await updateStatusFromPurchase(db, "test-id", "2026-03-01");
+
+    const params = mockRunAsync.mock.calls[0][1] as unknown[];
+    expect(params[0]).toBe("sufficient");
+    expect(params[2]).toBeNull(); // nextPurchaseDate
   });
 });
 

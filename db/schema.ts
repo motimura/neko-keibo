@@ -59,4 +59,14 @@ export async function initDatabase(db: SQLite.SQLiteDatabase): Promise<void> {
   } catch {
     // column already exists
   }
+
+  // Migrate average_consumption_days → reminder_days
+  await db.runAsync(`
+    UPDATE expenses SET reminder_days = (
+      SELECT inv.average_consumption_days FROM inventory inv
+      WHERE inv.id = expenses.inventory_id AND inv.average_consumption_days IS NOT NULL
+    )
+    WHERE inventory_id IS NOT NULL AND reminder_days IS NULL
+      AND EXISTS (SELECT 1 FROM inventory WHERE id = expenses.inventory_id AND average_consumption_days IS NOT NULL)
+  `);
 }

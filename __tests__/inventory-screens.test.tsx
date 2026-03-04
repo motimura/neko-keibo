@@ -32,7 +32,6 @@ const mockItem: InventoryItem = {
   category: "food",
   status: "critical",
   lastPurchasedAt: "2026-02-01",
-  averageConsumptionDays: 30,
   nextPurchaseDate: "2026-03-03",
   createdAt: "2026-02-01T00:00:00Z",
   updatedAt: "2026-02-01T00:00:00Z",
@@ -74,6 +73,7 @@ describe("InventoryEditModal", () => {
         onClose={jest.fn()}
         onSave={jest.fn()}
         onDelete={jest.fn()}
+        onRepurchase={jest.fn()}
       />
     );
     expect(screen.getByText(/ロイヤルカナン/)).toBeTruthy();
@@ -88,6 +88,7 @@ describe("InventoryEditModal", () => {
         onClose={jest.fn()}
         onSave={jest.fn()}
         onDelete={jest.fn()}
+        onRepurchase={jest.fn()}
       />
     );
     expect(toJSON()).toBeNull();

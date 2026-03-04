@@ -20,7 +20,16 @@ export async function refreshAllInventoryStatuses(
   db: SQLite.SQLiteDatabase
 ): Promise<number> {
   const rows = await db.getAllAsync(
-    `SELECT id, last_purchased_at, average_consumption_days, status FROM inventory WHERE average_consumption_days IS NOT NULL AND last_purchased_at IS NOT NULL`
+    `SELECT inv.id, inv.last_purchased_at, inv.status, e.reminder_days
+     FROM inventory inv
+     INNER JOIN expenses e ON e.inventory_id = inv.id
+     WHERE inv.last_purchased_at IS NOT NULL
+       AND e.reminder_days IS NOT NULL
+       AND e.id = (
+         SELECT e2.id FROM expenses e2
+         WHERE e2.inventory_id = inv.id AND e2.reminder_days IS NOT NULL
+         ORDER BY e2.expense_date DESC, e2.created_at DESC LIMIT 1
+       )`
   );
 
   const today = new Date();
@@ -29,7 +38,7 @@ export async function refreshAllInventoryStatuses(
   for (const r of rows as Record<string, unknown>[]) {
     const newStatus = calculateStatus(
       r.last_purchased_at as string,
-      r.average_consumption_days as number,
+      r.reminder_days as number,
       today
     );
     if (newStatus !== r.status) {

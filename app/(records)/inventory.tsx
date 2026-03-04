@@ -30,7 +30,7 @@ export default function InventoryScreen() {
 
   const handleSave = async (
     id: string,
-    updates: { status?: InventoryStatus; averageConsumptionDays?: number }
+    updates: { status?: InventoryStatus }
   ) => {
     await editItem(id, updates);
   };
@@ -54,12 +54,12 @@ export default function InventoryScreen() {
   return (
     <View className="flex-1">
       <View className="flex-row items-center justify-between px-4 py-2">
-        <Text className="text-sm text-gray-500">{items.length}件</Text>
+        <Text className="text-base text-gray-500">{items.length}件</Text>
         <Pressable
           onPress={() => setShowForm(true)}
           className="rounded-full bg-red-400 px-4 py-2"
         >
-          <Text className="text-sm font-bold text-white">＋ 追加</Text>
+          <Text className="text-base font-bold text-white">＋ 追加</Text>
         </Pressable>
       </View>
 
@@ -74,6 +74,9 @@ export default function InventoryScreen() {
         }}
         onSave={handleSave}
         onDelete={handleDelete}
+        onRepurchase={async (item) => {
+          await useInventoryStore.getState().repurchaseFromInventory(item);
+        }}
       />
     </View>
   );

@@ -23,7 +23,6 @@ const mockInventory: InventoryItem = {
   category: "food",
   status: "sufficient",
   lastPurchasedAt: "2025-01-15",
-  averageConsumptionDays: 30,
   nextPurchaseDate: "2025-02-14",
   createdAt: "2025-01-15T00:00:00.000Z",
   updatedAt: "2025-01-15T00:00:00.000Z",
@@ -87,7 +86,7 @@ describe("buildExportJSON", () => {
 
     expect(i.itemName).toBe("ロイヤルカナン");
     expect(i.status).toBe("sufficient");
-    expect(i.averageConsumptionDays).toBe(30);
+    expect(i).not.toHaveProperty("averageConsumptionDays");
   });
 
   it("preserves notification fields", () => {

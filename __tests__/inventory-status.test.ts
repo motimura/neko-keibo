@@ -53,14 +53,15 @@ describe("refreshAllInventoryStatuses", () => {
     db = SQLite.openDatabaseSync("test.db");
   });
 
-  it("avg_days未設定のアイテムはスキップする", async () => {
+  it("JOINクエリでexpensesのreminder_daysを参照する", async () => {
     mockGetAllAsync.mockResolvedValue([]);
 
     const count = await refreshAllInventoryStatuses(db);
     expect(count).toBe(0);
 
     const sql = mockGetAllAsync.mock.calls[0][0] as string;
-    expect(sql).toContain("average_consumption_days IS NOT NULL");
+    expect(sql).toContain("INNER JOIN expenses");
+    expect(sql).toContain("reminder_days IS NOT NULL");
     expect(sql).toContain("last_purchased_at IS NOT NULL");
   });
 
@@ -69,13 +70,13 @@ describe("refreshAllInventoryStatuses", () => {
       {
         id: "1",
         last_purchased_at: "2026-01-01",
-        average_consumption_days: 30,
+        reminder_days: 30,
         status: "sufficient",
       },
       {
         id: "2",
         last_purchased_at: "2026-03-01",
-        average_consumption_days: 30,
+        reminder_days: 30,
         status: "sufficient",
       },
     ]);

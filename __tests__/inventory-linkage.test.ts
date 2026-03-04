@@ -38,8 +38,8 @@ describe("linkPurchase", () => {
         category: "food",
         status: "critical",
         last_purchased_at: "2026-01-01",
-        average_consumption_days: 30,
-        next_purchase_date: "2026-01-31",
+        average_consumption_days: null,
+        next_purchase_date: null,
         created_at: "2026-01-01T00:00:00Z",
         updated_at: "2026-01-01T00:00:00Z",
       })
@@ -50,19 +50,22 @@ describe("linkPurchase", () => {
         category: "food",
         status: "critical",
         last_purchased_at: "2026-01-01",
-        average_consumption_days: 30,
-        next_purchase_date: "2026-01-31",
+        average_consumption_days: null,
+        next_purchase_date: null,
         created_at: "2026-01-01T00:00:00Z",
         updated_at: "2026-01-01T00:00:00Z",
       })
+      // updateStatusFromPurchase → getLatestExpenseByInventoryId
+      .mockResolvedValueOnce(null)
+      // updateStatusFromPurchase → getInventoryItemById (return)
       .mockResolvedValueOnce({
         id: "inv-1",
         item_name: "ロイヤルカナン",
         category: "food",
         status: "sufficient",
         last_purchased_at: "2026-03-01",
-        average_consumption_days: 30,
-        next_purchase_date: "2026-03-31",
+        average_consumption_days: null,
+        next_purchase_date: null,
         created_at: "2026-01-01T00:00:00Z",
         updated_at: "2026-03-01T00:00:00Z",
       });
@@ -77,7 +80,7 @@ describe("linkPurchase", () => {
 
     expect(result).toBe("inv-1");
     const updateSql = mockRunAsync.mock.calls[0][0] as string;
-    expect(updateSql).toContain("status = 'sufficient'");
+    expect(updateSql).toContain("status = ?");
   });
 
   it("新規在庫 → 自動作成される", async () => {

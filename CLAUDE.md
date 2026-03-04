@@ -124,8 +124,8 @@ CREATE TABLE IF NOT EXISTS inventory (
 ```
 
 - `status`: sufficient（十分）/ low（そろそろ）/ critical（切れそう）
-- `average_consumption_days`: 平均消費日数。設定するとステータスが自動更新される
-- `next_purchase_date`: last_purchased_at + average_consumption_days から自動計算
+- `average_consumption_days`: 廃止（DBカラムは残存するが読み書きしない）。ステータス計算は紐づく最新支出の `expenses.reminder_days` を使用
+- `next_purchase_date`: last_purchased_at + reminder_days から自動計算
 
 ## 支出カテゴリ
 
@@ -177,8 +177,9 @@ CREATE TABLE IF NOT EXISTS inventory (
 ### ステータス自動更新
 
 - アプリ起動時・在庫画面フォーカス時に `refreshAllInventoryStatuses()` を実行
-- `average_consumption_days` が設定されているアイテムのみ対象
-- `last_purchased_at + average_consumption_days - today` で残り日数を計算
+- 紐づく最新支出（`expenses.inventory_id`）の `reminder_days` が設定されているアイテムのみ対象
+- `last_purchased_at + reminder_days - today` で残り日数を計算
+- `inventory.average_consumption_days` は廃止済み。既存データは `db/schema.ts` の移行SQLで `expenses.reminder_days` にコピーされる
 
 ### タブナビゲーション
 

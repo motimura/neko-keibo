@@ -36,7 +36,6 @@ interface ExportInventory {
   category: string;
   status: string;
   lastPurchasedAt: string | null;
-  averageConsumptionDays: number | null;
   nextPurchaseDate: string | null;
   createdAt: string;
   updatedAt: string;
@@ -76,7 +75,6 @@ function inventoryToExport(i: InventoryItem): ExportInventory {
     category: i.category,
     status: i.status,
     lastPurchasedAt: i.lastPurchasedAt,
-    averageConsumptionDays: i.averageConsumptionDays,
     nextPurchaseDate: i.nextPurchaseDate,
     createdAt: i.createdAt,
     updatedAt: i.updatedAt,
@@ -159,7 +157,6 @@ async function getAllInventory(db: SQLite.SQLiteDatabase): Promise<InventoryItem
     category: row.category as ExpenseCategory,
     status: row.status as InventoryItem["status"],
     lastPurchasedAt: (row.last_purchased_at as string) || null,
-    averageConsumptionDays: (row.average_consumption_days as number) ?? null,
     nextPurchaseDate: (row.next_purchase_date as string) || null,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
