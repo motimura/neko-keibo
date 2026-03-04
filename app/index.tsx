@@ -26,7 +26,7 @@ export default function HomeScreen() {
         {criticalCount > 0 && (
           <Link href="/(records)/inventory" asChild>
             <Pressable className="mx-4 mt-3 rounded-lg bg-red-50 px-4 py-3">
-              <Text className="text-sm font-bold text-red-600">
+              <Text className="text-base font-bold text-red-600">
                 🔴 {criticalCount}件の在庫が切れそうです
               </Text>
             </Pressable>

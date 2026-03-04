@@ -119,11 +119,11 @@ export default function SettingsScreen() {
       {busy && (
         <View className="mb-4 flex-row items-center justify-center gap-2 rounded-lg bg-blue-50 py-3">
           <ActivityIndicator size="small" />
-          <Text className="text-sm text-blue-600">処理中...</Text>
+          <Text className="text-base text-blue-600">処理中...</Text>
         </View>
       )}
 
-      <Text className="mb-2 text-xs font-medium uppercase text-gray-400">データ管理</Text>
+      <Text className="mb-2 text-sm font-medium uppercase text-gray-400">データ管理</Text>
       <View className="mb-6 rounded-xl bg-white">
         <SettingsButton
           label="JSONでバックアップ"
@@ -154,7 +154,7 @@ export default function SettingsScreen() {
         />
       </View>
 
-      <Text className="mb-2 text-xs font-medium uppercase text-gray-400">データ削除</Text>
+      <Text className="mb-2 text-sm font-medium uppercase text-gray-400">データ削除</Text>
       <View className="mb-6 rounded-xl bg-white">
         <SettingsButton
           label="全データを削除"
@@ -165,16 +165,16 @@ export default function SettingsScreen() {
         />
       </View>
 
-      <Text className="mb-2 text-xs font-medium uppercase text-gray-400">アプリ情報</Text>
+      <Text className="mb-2 text-sm font-medium uppercase text-gray-400">アプリ情報</Text>
       <View className="mb-6 rounded-xl bg-white p-4">
-        <Text className="mb-1 text-lg font-bold">猫計簿</Text>
-        <Text className="mb-4 text-sm text-gray-500">Version 2.0.0</Text>
+        <Text className="mb-1 text-xl font-bold">猫計簿</Text>
+        <Text className="mb-4 text-base text-gray-500">Version 2.0.0</Text>
         <View className="gap-1">
-          <Text className="text-sm text-gray-600">支出: {counts.expenses}件</Text>
-          <Text className="text-sm text-gray-600">在庫: {counts.inventory}件</Text>
-          <Text className="text-sm text-gray-600">通知: {counts.notifications}件</Text>
+          <Text className="text-base text-gray-600">支出: {counts.expenses}件</Text>
+          <Text className="text-base text-gray-600">在庫: {counts.inventory}件</Text>
+          <Text className="text-base text-gray-600">通知: {counts.notifications}件</Text>
         </View>
-        <Text className="mt-4 text-xs text-gray-400">
+        <Text className="mt-4 text-sm text-gray-400">
           猫にかかる費用を記録・管理するアプリです。{"\n"}
           データは端末内に保存されます。
         </Text>
@@ -198,10 +198,10 @@ function SettingsButton({
 }) {
   return (
     <Pressable onPress={onPress} className="flex-row items-center px-4 py-3">
-      <Text className="mr-3 text-lg">{icon}</Text>
+      <Text className="mr-3 text-xl">{icon}</Text>
       <View className="flex-1">
-        <Text className={`text-base font-medium ${destructive ? "text-red-500" : ""}`}>{label}</Text>
-        <Text className="text-xs text-gray-400">{description}</Text>
+        <Text className={`text-lg font-medium ${destructive ? "text-red-500" : ""}`}>{label}</Text>
+        <Text className="text-sm text-gray-400">{description}</Text>
       </View>
       <Text className="text-gray-300">›</Text>
     </Pressable>

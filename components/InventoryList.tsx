@@ -29,16 +29,16 @@ function RemainingDays({ item }: { item: InventoryItem }) {
   if (!item.nextPurchaseDate) return null;
   const remaining = differenceInDays(new Date(item.nextPurchaseDate), new Date());
   if (remaining <= 0) {
-    return <Text className="text-xs text-red-500">期限超過</Text>;
+    return <Text className="text-sm text-red-500">期限超過</Text>;
   }
-  return <Text className="text-xs text-gray-400">あと{remaining}日</Text>;
+  return <Text className="text-sm text-gray-400">あと{remaining}日</Text>;
 }
 
 export default function InventoryList({ items, onPress }: InventoryListProps) {
   if (items.length === 0) {
     return (
       <View className="flex-1 items-center justify-center p-8">
-        <Text className="text-lg">📦</Text>
+        <Text className="text-xl">📦</Text>
         <Text className="mt-2 text-gray-400">在庫アイテムがありません</Text>
       </View>
     );
@@ -55,8 +55,8 @@ export default function InventoryList({ items, onPress }: InventoryListProps) {
           className="flex-row items-center justify-between px-4 py-2"
           style={{ backgroundColor: section.color + "20" }}
         >
-          <Text className="text-sm font-bold">{section.title}</Text>
-          <Text className="text-xs text-gray-500">{section.data.length}件</Text>
+          <Text className="text-base font-bold">{section.title}</Text>
+          <Text className="text-sm text-gray-500">{section.data.length}件</Text>
         </View>
       )}
       renderItem={({ item }) => (
@@ -64,19 +64,19 @@ export default function InventoryList({ items, onPress }: InventoryListProps) {
           onPress={() => onPress(item)}
           className="flex-row items-center border-b border-gray-100 bg-white px-4 py-3"
         >
-          <Text className="mr-2 text-lg">{CATEGORY_EMOJI[item.category]}</Text>
+          <Text className="mr-2 text-xl">{CATEGORY_EMOJI[item.category]}</Text>
           <View className="flex-1">
-            <Text className="text-sm font-medium">{item.itemName}</Text>
+            <Text className="text-base font-medium">{item.itemName}</Text>
             <View className="flex-row items-center gap-2">
               {item.lastPurchasedAt && (
-                <Text className="text-xs text-gray-400">
+                <Text className="text-sm text-gray-400">
                   最終購入: {item.lastPurchasedAt}
                 </Text>
               )}
               <RemainingDays item={item} />
             </View>
           </View>
-          <Text className="text-lg">›</Text>
+          <Text className="text-xl">›</Text>
         </Pressable>
       )}
       contentContainerStyle={{ paddingBottom: 32 }}

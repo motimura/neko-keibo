@@ -23,17 +23,17 @@ export default function Dashboard({ summary }: DashboardProps) {
     amount: amount ?? 0,
     color: CATEGORY_COLORS[cat as ExpenseCategory],
     legendFontColor: "#333",
-    legendFontSize: 12,
+    legendFontSize: 14,
   }));
 
   return (
     <View className="p-4">
       <View className="mb-4 items-center rounded-xl bg-white p-6 shadow-sm">
-        <Text className="text-sm text-gray-500">今月の合計</Text>
+        <Text className="text-base text-gray-500">今月の合計</Text>
         <Text className="text-3xl font-bold">¥{summary.totalAmount.toLocaleString()}</Text>
         {summary.comparedToPrevMonth && (
           <Text
-            className="mt-1 text-sm"
+            className="mt-1 text-base"
             style={{ color: summary.comparedToPrevMonth.diff > 0 ? "#FF6B6B" : "#4ECDC4" }}
           >
             前月比 {summary.comparedToPrevMonth.diff > 0 ? "+" : ""}
@@ -46,7 +46,7 @@ export default function Dashboard({ summary }: DashboardProps) {
 
       {chartData.length > 0 ? (
         <View className="items-center rounded-xl bg-white p-4 shadow-sm">
-          <Text className="mb-2 text-sm font-medium text-gray-500">カテゴリ別内訳</Text>
+          <Text className="mb-2 text-base font-medium text-gray-500">カテゴリ別内訳</Text>
           <PieChart
             data={chartData}
             width={screenWidth - 64}

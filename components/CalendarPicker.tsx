@@ -45,20 +45,20 @@ export default function CalendarPicker({ visible, date, onConfirm, onCancel }: C
         <Pressable onPress={() => {}} className="mx-6 w-80 rounded-2xl bg-white p-4">
           <View className="mb-3 flex-row items-center justify-between">
             <Pressable onPress={() => setViewMonth(subMonths(viewMonth, 1))} className="px-3 py-1">
-              <Text className="text-xl">◀</Text>
+              <Text className="text-2xl">◀</Text>
             </Pressable>
-            <Text className="text-base font-bold">
+            <Text className="text-lg font-bold">
               {format(viewMonth, "yyyy年M月", { locale: ja })}
             </Text>
             <Pressable onPress={() => setViewMonth(addMonths(viewMonth, 1))} className="px-3 py-1">
-              <Text className="text-xl">▶</Text>
+              <Text className="text-2xl">▶</Text>
             </Pressable>
           </View>
 
           <View className="mb-1 flex-row">
             {WEEKDAYS.map((d, i) => (
               <View key={d} className="flex-1 items-center py-1">
-                <Text className={`text-xs font-medium ${i === 0 ? "text-red-400" : i === 6 ? "text-blue-400" : "text-gray-500"}`}>
+                <Text className={`text-sm font-medium ${i === 0 ? "text-red-400" : i === 6 ? "text-blue-400" : "text-gray-500"}`}>
                   {d}
                 </Text>
               </View>
@@ -84,7 +84,7 @@ export default function CalendarPicker({ visible, date, onConfirm, onCancel }: C
                     className={`h-8 w-8 items-center justify-center rounded-full ${isSelected ? "bg-red-400" : ""}`}
                   >
                     <Text
-                      className={`text-sm ${
+                      className={`text-base ${
                         isSelected
                           ? "font-bold text-white"
                           : !isCurrentMonth
@@ -106,22 +106,22 @@ export default function CalendarPicker({ visible, date, onConfirm, onCancel }: C
 
           <View className="mt-3 flex-row items-center justify-between">
             <Pressable onPress={() => setViewMonth(subMonths(viewMonth, 1))} className="rounded-lg bg-gray-100 px-4 py-2">
-              <Text className="text-sm text-gray-600">◀ 前月</Text>
+              <Text className="text-base text-gray-600">◀ 前月</Text>
             </Pressable>
             <Pressable onPress={() => setViewMonth(addMonths(viewMonth, 1))} className="rounded-lg bg-gray-100 px-4 py-2">
-              <Text className="text-sm text-gray-600">翌月 ▶</Text>
+              <Text className="text-base text-gray-600">翌月 ▶</Text>
             </Pressable>
           </View>
 
           <View className="mt-3 flex-row justify-end gap-3">
             <Pressable onPress={onCancel} className="rounded-lg px-5 py-2">
-              <Text className="text-sm text-gray-500">キャンセル</Text>
+              <Text className="text-base text-gray-500">キャンセル</Text>
             </Pressable>
             <Pressable
               onPress={() => onConfirm(selected)}
               className="rounded-lg bg-red-400 px-5 py-2"
             >
-              <Text className="text-sm font-bold text-white">確定</Text>
+              <Text className="text-base font-bold text-white">確定</Text>
             </Pressable>
           </View>
         </Pressable>

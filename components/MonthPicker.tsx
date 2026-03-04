@@ -17,11 +17,11 @@ export default function MonthPicker({ month, onChangeMonth }: MonthPickerProps) 
   return (
     <View className="flex-row items-center justify-center gap-4 py-3">
       <Pressable onPress={goPrev} className="px-3 py-1">
-        <Text className="text-xl">◀</Text>
+        <Text className="text-2xl">◀</Text>
       </Pressable>
-      <Text className="text-lg font-bold">{label}</Text>
+      <Text className="text-xl font-bold">{label}</Text>
       <Pressable onPress={goNext} className="px-3 py-1">
-        <Text className="text-xl">▶</Text>
+        <Text className="text-2xl">▶</Text>
       </Pressable>
     </View>
   );

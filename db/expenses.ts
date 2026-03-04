@@ -127,3 +127,15 @@ export async function deleteExpense(
   const result = await db.runAsync(`DELETE FROM expenses WHERE id = ?`, [id]);
   return result.changes > 0;
 }
+
+export async function getLatestExpenseByInventoryId(
+  db: SQLite.SQLiteDatabase,
+  inventoryId: string
+): Promise<Expense | null> {
+  const row = await db.getFirstAsync(
+    `SELECT * FROM expenses WHERE inventory_id = ? ORDER BY expense_date DESC, created_at DESC LIMIT 1`,
+    [inventoryId]
+  );
+  if (!row) return null;
+  return rowToExpense(row as Record<string, unknown>);
+}

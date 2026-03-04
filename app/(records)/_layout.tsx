@@ -24,7 +24,7 @@ export default function RecordsLayout() {
             style={{ marginHorizontal: 4 }}
           >
             <Text
-              className={`text-center text-sm font-bold ${active === seg.key ? "text-white" : "text-gray-600"}`}
+              className={`text-center text-base font-bold ${active === seg.key ? "text-white" : "text-gray-600"}`}
             >
               {seg.label}
             </Text>

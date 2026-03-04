@@ -39,8 +39,8 @@ export default function ExpensesScreen() {
     <View className="flex-1">
       <MonthPicker month={currentMonth} onChangeMonth={setMonth} />
       <View className="flex-row items-center justify-between px-4 pb-2">
-        <Text className="text-sm text-gray-500">{expenses.length}件</Text>
-        <Text className="text-sm font-bold">合計 ¥{total.toLocaleString()}</Text>
+        <Text className="text-base text-gray-500">{expenses.length}件</Text>
+        <Text className="text-base font-bold">合計 ¥{total.toLocaleString()}</Text>
       </View>
       <ExpenseList
         expenses={expenses}

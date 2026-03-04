@@ -9,9 +9,11 @@ import {
   updateStatusFromPurchase,
   findInventoryByName,
 } from "../db/inventory";
+import { getLatestExpenseByInventoryId } from "../db/expenses";
 import { refreshAllInventoryStatuses } from "../utils/inventoryStatus";
 import { useExpenseStore } from "./useExpenseStore";
-import { CONSUMABLE_CATEGORIES } from "../utils/constants";
+import { CONSUMABLE_CATEGORIES, CATEGORY_EMOJI } from "../utils/constants";
+import { scheduleReminder, cancelReminder } from "../utils/notifications";
 import { format } from "date-fns";
 
 interface InventoryStore {
@@ -25,6 +27,7 @@ interface InventoryStore {
   removeItem: (id: string) => Promise<void>;
   refreshStatuses: () => Promise<void>;
   linkPurchase: (itemName: string, category: ExpenseCategory, expenseDate: string) => Promise<string | null>;
+  repurchaseFromInventory: (item: InventoryItem) => Promise<void>;
 }
 
 function getDb() {
@@ -101,5 +104,59 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
     });
     await get().fetchItems();
     return newItem.id;
+  },
+
+  repurchaseFromInventory: async (item: InventoryItem) => {
+    const db = requireDb();
+    const today = format(new Date(), "yyyy-MM-dd");
+
+    const lastExpense = await getLatestExpenseByInventoryId(db, item.id);
+    const amount = lastExpense?.amount ?? 0;
+    const oldReminderDays = lastExpense?.reminderDays ?? null;
+
+    // Cancel old notification if exists
+    if (lastExpense?.notificationId) {
+      try {
+        await cancelReminder(lastExpense.notificationId);
+      } catch {}
+    }
+    // Clear old expense's notification settings
+    if (lastExpense) {
+      const { updateExpense } = require("../db/expenses");
+      await updateExpense(db, lastExpense.id, { reminderDays: null, notificationId: null });
+    }
+
+    // Create new expense
+    const expenseStore = useExpenseStore.getState();
+    const newExpense = await expenseStore.addExpense(
+      {
+        category: item.category,
+        amount,
+        itemName: item.itemName,
+        expenseDate: today,
+        memo: "",
+        inventoryId: item.id,
+        reminderDays: oldReminderDays ?? undefined,
+      },
+      false // skip linkPurchase since we handle it manually
+    );
+
+    // Update inventory status
+    await updateStatusFromPurchase(db, item.id, today);
+
+    // Schedule new notification with inherited reminder_days
+    if (oldReminderDays && oldReminderDays > 0) {
+      const emoji = CATEGORY_EMOJI[item.category] || "📦";
+      const notificationId = await scheduleReminder(
+        item.itemName,
+        emoji,
+        oldReminderDays,
+        newExpense.id
+      );
+      const { updateExpense } = require("../db/expenses");
+      await updateExpense(db, newExpense.id, { notificationId });
+    }
+
+    await get().fetchItems();
   },
 }));

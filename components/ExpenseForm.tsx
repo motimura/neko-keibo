@@ -100,7 +100,7 @@ export default function ExpenseForm({
 
   return (
     <ScrollView className="flex-1 p-4">
-      <Text className="mb-2 text-sm font-medium text-gray-600">カテゴリ</Text>
+      <Text className="mb-2 text-base font-medium text-gray-600">カテゴリ</Text>
       <View className="mb-4 flex-row flex-wrap gap-2">
         {EXPENSE_CATEGORIES.map((cat) => (
           <Pressable
@@ -108,14 +108,14 @@ export default function ExpenseForm({
             onPress={() => handleCategoryChange(cat)}
             className={`rounded-2xl px-4 py-3 ${category === cat ? "bg-red-100 border-2 border-red-400" : "bg-gray-100"}`}
           >
-            <Text className={`text-base ${category === cat ? "font-bold" : ""}`}>
+            <Text className={`text-lg ${category === cat ? "font-bold" : ""}`}>
               {CATEGORY_EMOJI[cat]} {CATEGORY_LABELS[cat]}
             </Text>
           </Pressable>
         ))}
       </View>
 
-      <Text className="mb-2 text-sm font-medium text-gray-600">品名</Text>
+      <Text className="mb-2 text-base font-medium text-gray-600">品名</Text>
       <TextInput
         value={itemName}
         onChangeText={setItemName}
@@ -123,7 +123,7 @@ export default function ExpenseForm({
         className="mb-4 rounded-lg border border-gray-200 px-3 py-3"
       />
 
-      <Text className="mb-2 text-sm font-medium text-gray-600">金額 (円)</Text>
+      <Text className="mb-2 text-base font-medium text-gray-600">金額 (円)</Text>
       <TextInput
         value={amount}
         onChangeText={setAmount}
@@ -132,12 +132,12 @@ export default function ExpenseForm({
         className="mb-4 rounded-lg border border-gray-200 px-3 py-3"
       />
 
-      <Text className="mb-2 text-sm font-medium text-gray-600">日付</Text>
+      <Text className="mb-2 text-base font-medium text-gray-600">日付</Text>
       <Pressable
         onPress={() => setDatePickerVisible(true)}
         className="mb-4 rounded-lg border border-gray-200 px-3 py-3"
       >
-        <Text className="text-base text-gray-900">📅 {expenseDate}</Text>
+        <Text className="text-lg text-gray-900">📅 {expenseDate}</Text>
       </Pressable>
       <CalendarPicker
         visible={datePickerVisible}
@@ -149,7 +149,7 @@ export default function ExpenseForm({
         onCancel={() => setDatePickerVisible(false)}
       />
 
-      <Text className="mb-2 text-sm font-medium text-gray-600">メモ (任意)</Text>
+      <Text className="mb-2 text-base font-medium text-gray-600">メモ (任意)</Text>
       <TextInput
         value={memo}
         onChangeText={setMemo}
@@ -161,8 +161,8 @@ export default function ExpenseForm({
       {showInventoryToggle && (
         <View className="mb-6 flex-row items-center justify-between rounded-lg bg-gray-50 px-4 py-3">
           <View>
-            <Text className="text-sm font-medium text-gray-700">在庫に追加</Text>
-            <Text className="text-xs text-gray-400">購入品を在庫管理に登録します</Text>
+            <Text className="text-base font-medium text-gray-700">在庫に追加</Text>
+            <Text className="text-sm text-gray-400">購入品を在庫管理に登録します</Text>
           </View>
           <Switch
             value={inventoryToggleValue}
@@ -187,7 +187,7 @@ export default function ExpenseForm({
         className="rounded-lg bg-red-400 py-4"
         style={{ opacity: submitting ? 0.5 : 1 }}
       >
-        <Text className="text-center text-base font-bold text-white">
+        <Text className="text-center text-lg font-bold text-white">
           {editTarget ? "更新する" : "登録する"}
         </Text>
       </Pressable>

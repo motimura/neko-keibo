@@ -73,8 +73,8 @@ export default function ReminderSetting({
     <View className="mb-6 rounded-lg bg-gray-50 px-4 py-3">
       <View className="flex-row items-center justify-between">
         <View>
-          <Text className="text-sm font-medium text-gray-700">通知を設定する</Text>
-          <Text className="text-xs text-gray-400">買い替え時期をリマインドします</Text>
+          <Text className="text-base font-medium text-gray-700">通知を設定する</Text>
+          <Text className="text-sm text-gray-400">買い替え時期をリマインドします</Text>
         </View>
         <Switch
           value={enabled}
@@ -100,7 +100,7 @@ export default function ReminderSetting({
                 className={`flex-1 rounded-lg py-2 ${unit === u.key ? "bg-red-400" : "bg-gray-200"}`}
               >
                 <Text
-                  className={`text-center text-sm font-bold ${unit === u.key ? "text-white" : "text-gray-600"}`}
+                  className={`text-center text-base font-bold ${unit === u.key ? "text-white" : "text-gray-600"}`}
                 >
                   {u.label}
                 </Text>

@@ -21,12 +21,12 @@ function NotificationCard({
   return (
     <View className="mx-4 mb-3 rounded-xl bg-white p-4 shadow-sm">
       <View className="mb-2 flex-row items-center gap-2">
-        <Text className="text-lg">{emoji}</Text>
-        <Text className="flex-1 text-base font-bold">{notification.itemName}</Text>
-        <Text className="text-base font-bold">¥{notification.amount.toLocaleString()}</Text>
+        <Text className="text-xl">{emoji}</Text>
+        <Text className="flex-1 text-lg font-bold">{notification.itemName}</Text>
+        <Text className="text-lg font-bold">¥{notification.amount.toLocaleString()}</Text>
       </View>
 
-      <Text className="mb-3 text-xs text-gray-400">
+      <Text className="mb-3 text-sm text-gray-400">
         通知日: {notification.notifiedAt.slice(0, 10)}
       </Text>
 
@@ -35,15 +35,15 @@ function NotificationCard({
           onPress={() => onRepurchase(notification)}
           className="flex-1 rounded-lg bg-red-400 py-2"
         >
-          <Text className="text-center text-sm font-bold text-white">同じものを購入</Text>
+          <Text className="text-center text-base font-bold text-white">同じものを購入</Text>
         </Pressable>
 
         <Pressable className="rounded-lg bg-gray-200 px-4 py-2">
-          <Text className="text-center text-sm text-gray-600">あとで</Text>
+          <Text className="text-center text-base text-gray-600">あとで</Text>
         </Pressable>
 
         <Pressable onPress={() => onDismiss(notification)} className="rounded-lg px-3 py-2">
-          <Text className="text-center text-sm text-red-500">通知をオフ</Text>
+          <Text className="text-center text-base text-red-500">通知をオフ</Text>
         </Pressable>
       </View>
     </View>
@@ -104,7 +104,7 @@ export default function NotificationsScreen() {
   if (notifications.length === 0) {
     return (
       <View className="flex-1 items-center justify-center bg-gray-50">
-        <Text className="text-lg">🎉</Text>
+        <Text className="text-xl">🎉</Text>
         <Text className="mt-2 text-gray-400">通知はありません</Text>
       </View>
     );
@@ -113,7 +113,7 @@ export default function NotificationsScreen() {
   return (
     <View className="flex-1 bg-gray-50">
       <View className="px-4 py-2">
-        <Text className="text-sm text-gray-500">{notifications.length}件の未対応通知</Text>
+        <Text className="text-base text-gray-500">{notifications.length}件の未対応通知</Text>
       </View>
       <FlatList
         data={notifications}

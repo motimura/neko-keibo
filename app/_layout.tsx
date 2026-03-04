@@ -66,7 +66,7 @@ export default function RootLayout() {
         name="index"
         options={{
           title: "ホーム",
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>🏠</Text>,
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 24 }}>🏠</Text>,
         }}
       />
       <Tabs.Screen
@@ -80,14 +80,14 @@ export default function RootLayout() {
         name="(records)"
         options={{
           title: "記録",
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>📋</Text>,
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 24 }}>📋</Text>,
         }}
       />
       <Tabs.Screen
         name="notifications"
         options={{
           title: "通知",
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>🔔</Text>,
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 24 }}>🔔</Text>,
           tabBarBadge: pendingCount > 0 ? pendingCount : undefined,
           tabBarBadgeStyle: { backgroundColor: "#FF6B6B" },
         }}
@@ -96,7 +96,7 @@ export default function RootLayout() {
         name="settings"
         options={{
           title: "設定",
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>⚙️</Text>,
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 24 }}>⚙️</Text>,
         }}
       />
     </Tabs>

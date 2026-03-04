@@ -46,13 +46,13 @@ export default function AddScreen() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-3">
-        <Text className="text-lg font-bold">支出登録</Text>
+        <Text className="text-xl font-bold">支出登録</Text>
         <Pressable
           onPress={() => router.back()}
           className="h-10 w-10 items-center justify-center rounded-full bg-gray-100"
           hitSlop={8}
         >
-          <Text className="text-lg text-gray-500">✕</Text>
+          <Text className="text-xl text-gray-500">✕</Text>
         </Pressable>
       </View>
       <ExpenseForm

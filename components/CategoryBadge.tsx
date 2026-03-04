@@ -13,7 +13,7 @@ export default function CategoryBadge({ category }: CategoryBadgeProps) {
       style={{ backgroundColor: CATEGORY_COLORS[category] + "30" }}
     >
       <Text className="mr-1">{CATEGORY_EMOJI[category]}</Text>
-      <Text className="text-xs font-medium" style={{ color: CATEGORY_COLORS[category] }}>
+      <Text className="text-sm font-medium" style={{ color: CATEGORY_COLORS[category] }}>
         {CATEGORY_LABELS[category]}
       </Text>
     </View>

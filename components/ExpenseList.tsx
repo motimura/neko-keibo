@@ -19,7 +19,7 @@ export default function ExpenseList({ expenses, onDelete, onEdit }: ExpenseListP
   if (expenses.length === 0) {
     return (
       <View className="flex-1 items-center justify-center py-10">
-        <Text className="text-gray-400 text-base">この月の支出はありません</Text>
+        <Text className="text-gray-400 text-lg">この月の支出はありません</Text>
       </View>
     );
   }
@@ -39,12 +39,12 @@ export default function ExpenseList({ expenses, onDelete, onEdit }: ExpenseListP
               <CategoryBadge category={item.category} />
               <Text className="font-medium">{item.itemName}</Text>
               {item.reminderDays != null && (
-                <Text className="text-sm text-gray-400">🔔</Text>
+                <Text className="text-base text-gray-400">🔔</Text>
               )}
             </View>
-            <Text className="text-xs text-gray-400">{item.expenseDate}</Text>
+            <Text className="text-sm text-gray-400">{item.expenseDate}</Text>
           </View>
-          <Text className="text-base font-bold">¥{item.amount.toLocaleString()}</Text>
+          <Text className="text-lg font-bold">¥{item.amount.toLocaleString()}</Text>
         </Pressable>
       )}
     />
