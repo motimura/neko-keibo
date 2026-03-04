@@ -17,6 +17,7 @@ iOS / Android 両対応。ローカルファーストで端末内にデータを
 - **状態管理**: Zustand
 - **ナビゲーション**: Expo Router (file-based routing)
 - **グラフ**: react-native-chart-kit または victory-native
+- **日付ピッカー**: react-native-modal-datetime-picker + @react-native-community/datetimepicker
 - **通知**: expo-notifications（Phase 3: 買い替えリマインダー）
 - **ファイル操作**: expo-file-system + expo-sharing + expo-document-picker（Phase 4: エクスポート/インポート）
 - **ビルド & 配信**: EAS Build + EAS Submit
@@ -28,11 +29,14 @@ iOS / Android 両対応。ローカルファーストで端末内にデータを
 ```
 neko-keibo/
 ├── app/                        # Expo Router (画面定義)
-│   ├── _layout.tsx             # ルートレイアウト
-│   ├── index.tsx               # ホーム（ダッシュボード）
-│   ├── add.tsx                 # 支出登録
-│   ├── expenses.tsx            # 支出一覧
-│   ├── inventory.tsx           # 在庫管理
+│   ├── _layout.tsx             # ルートレイアウト (4タブ: ホーム/記録/通知/設定)
+│   ├── index.tsx               # ホーム（ダッシュボード）+ FABボタン
+│   ├── add.tsx                 # 支出登録（モーダル、タブ非表示）
+│   ├── (records)/              # 記録タブ（セグメントコントロール）
+│   │   ├── _layout.tsx         # セグメントコントロール（支出一覧/在庫管理）
+│   │   ├── index.tsx           # → expenses へリダイレクト
+│   │   ├── expenses.tsx        # 支出一覧 + FABボタン
+│   │   └── inventory.tsx       # 在庫管理
 │   ├── notifications.tsx       # 通知一覧
 │   └── settings.tsx            # 設定
 ├── components/                 # 共通コンポーネント
@@ -141,10 +145,10 @@ CREATE TABLE IF NOT EXISTS inventory (
 
 | 画面 | パス | 説明 |
 |------|------|------|
-| ホーム | / | 月間ダッシュボード（合計金額、カテゴリ別円グラフ、前月比）+ 在庫アラート |
-| 支出登録 | /add | カテゴリ、品名、金額、日付、メモ + 在庫連動トグル + 通知設定 |
-| 支出一覧 | /expenses | 月別の支出リスト、通知設定済みに🔔表示、スワイプで編集・削除 |
-| 在庫管理 | /inventory | ステータス別セクション表示、手動追加、詳細編集モーダル |
+| ホーム | / | 月間ダッシュボード（合計金額、カテゴリ別円グラフ、前月比）+ 在庫アラート + FAB＋ボタン |
+| 支出登録 | /add | モーダル表示。カテゴリ、品名、金額、日付（カレンダーピッカー）、メモ + 在庫連動トグル + 通知設定 |
+| 記録（支出一覧） | /(records)/expenses | 月別の支出リスト、通知設定済みに🔔表示、スワイプで編集・削除 + FAB＋ボタン |
+| 記録（在庫管理） | /(records)/inventory | ステータス別セクション表示、手動追加、詳細編集モーダル |
 | 通知一覧 | /notifications | 未対応の通知リスト、再購入/あとで/通知オフのアクション |
 | 設定 | /settings | JSON/CSVエクスポート、バックアップ復元、CSVインポート、全データ削除、アプリ情報 |
 
@@ -178,7 +182,10 @@ CREATE TABLE IF NOT EXISTS inventory (
 
 ### タブナビゲーション
 
-ホーム / 登録 / 一覧 / 在庫 / 通知 / 設定 の6タブ構成。在庫タブには critical 件数、通知タブには未対応件数のバッジを表示。
+ホーム / 記録 / 通知 / 設定 の4タブ構成。
+- 「登録」はタブから削除 → ホーム・記録画面のFAB「＋」ボタンからモーダルで開く
+- 「一覧」と「在庫」は「記録」タブに統合、セグメントコントロールで切替
+- 通知タブには未対応件数のバッジを表示
 
 ## 開発フェーズ
 

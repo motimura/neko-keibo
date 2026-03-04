@@ -8,17 +8,22 @@ jest.mock("expo-sqlite", () => ({
 }));
 
 jest.mock("expo-router", () => ({
-  useRouter: jest.fn(() => ({ navigate: jest.fn() })),
+  useRouter: jest.fn(() => ({ navigate: jest.fn(), push: jest.fn(), back: jest.fn(), replace: jest.fn() })),
   useFocusEffect: jest.fn((cb) => cb()),
+  usePathname: jest.fn(() => "/expenses"),
   Tabs: Object.assign(
     ({ children }: { children: React.ReactNode }) => children,
     { Screen: () => null }
   ),
+  Slot: () => null,
+  Link: ({ children }: { children: React.ReactNode }) => children,
+  Redirect: () => null,
 }));
 
 jest.mock("react-native-chart-kit", () => ({
   PieChart: () => null,
 }));
+
 
 import React from "react";
 import { render, screen } from "@testing-library/react-native";

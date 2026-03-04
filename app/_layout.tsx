@@ -18,7 +18,6 @@ export default function RootLayout() {
   const init = useExpenseStore((s) => s.init);
   const ready = useExpenseStore((s) => s.ready);
   const db = useExpenseStore((s) => s.db);
-  const criticalCount = useInventoryStore((s) => s.criticalCount);
   const refreshStatuses = useInventoryStore((s) => s.refreshStatuses);
   const pendingCount = useNotificationStore((s) => s.pendingCount);
   const fetchPendingCount = useNotificationStore((s) => s.fetchPendingCount);
@@ -51,6 +50,10 @@ export default function RootLayout() {
     }
   }, [ready]);
 
+  if (!ready) {
+    return null;
+  }
+
   return (
     <Tabs
       screenOptions={{
@@ -69,24 +72,15 @@ export default function RootLayout() {
       <Tabs.Screen
         name="add"
         options={{
-          title: "登録",
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>✏️</Text>,
+          href: null,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
-        name="expenses"
+        name="(records)"
         options={{
-          title: "一覧",
+          title: "記録",
           tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>📋</Text>,
-        }}
-      />
-      <Tabs.Screen
-        name="inventory"
-        options={{
-          title: "在庫",
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>📦</Text>,
-          tabBarBadge: criticalCount > 0 ? criticalCount : undefined,
-          tabBarBadgeStyle: { backgroundColor: "#FF6B6B" },
         }}
       />
       <Tabs.Screen

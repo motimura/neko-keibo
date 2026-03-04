@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { View, Text, TextInput, Pressable, ScrollView, Alert, Switch } from "react-native";
 import { format } from "date-fns";
+import CalendarPicker from "./CalendarPicker";
 import { EXPENSE_CATEGORIES, type ExpenseCategory, type Expense } from "../types/expense";
 import { CATEGORY_LABELS, CATEGORY_EMOJI, CONSUMABLE_CATEGORIES } from "../utils/constants";
 import { validateCreateExpense } from "../utils/validator";
@@ -47,6 +48,7 @@ export default function ExpenseForm({
   const [expenseDate, setExpenseDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [memo, setMemo] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
 
   useEffect(() => {
     if (editTarget) {
@@ -104,9 +106,9 @@ export default function ExpenseForm({
           <Pressable
             key={cat}
             onPress={() => handleCategoryChange(cat)}
-            className={`rounded-full px-3 py-2 ${category === cat ? "bg-red-100" : "bg-gray-100"}`}
+            className={`rounded-2xl px-4 py-3 ${category === cat ? "bg-red-100 border-2 border-red-400" : "bg-gray-100"}`}
           >
-            <Text className={category === cat ? "font-bold" : ""}>
+            <Text className={`text-base ${category === cat ? "font-bold" : ""}`}>
               {CATEGORY_EMOJI[cat]} {CATEGORY_LABELS[cat]}
             </Text>
           </Pressable>
@@ -131,11 +133,20 @@ export default function ExpenseForm({
       />
 
       <Text className="mb-2 text-sm font-medium text-gray-600">日付</Text>
-      <TextInput
-        value={expenseDate}
-        onChangeText={setExpenseDate}
-        placeholder="YYYY-MM-DD"
+      <Pressable
+        onPress={() => setDatePickerVisible(true)}
         className="mb-4 rounded-lg border border-gray-200 px-3 py-3"
+      >
+        <Text className="text-base text-gray-900">📅 {expenseDate}</Text>
+      </Pressable>
+      <CalendarPicker
+        visible={datePickerVisible}
+        date={new Date(expenseDate + "T00:00:00")}
+        onConfirm={(date) => {
+          setExpenseDate(format(date, "yyyy-MM-dd"));
+          setDatePickerVisible(false);
+        }}
+        onCancel={() => setDatePickerVisible(false)}
       />
 
       <Text className="mb-2 text-sm font-medium text-gray-600">メモ (任意)</Text>
@@ -186,6 +197,8 @@ export default function ExpenseForm({
           <Text className="text-center text-gray-500">キャンセル</Text>
         </Pressable>
       )}
+
+      <View className="h-32" />
     </ScrollView>
   );
 }
