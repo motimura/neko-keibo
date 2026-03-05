@@ -79,7 +79,7 @@ export default function RootLayout() {
       <Tabs.Screen
         name="(records)"
         options={{
-          title: "記録",
+          title: "記録・在庫",
           tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 24 }}>📋</Text>,
         }}
       />

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { View, Text, TextInput, Pressable, ScrollView, Alert, Switch } from "react-native";
 import { format } from "date-fns";
 import CalendarPicker from "./CalendarPicker";
@@ -42,6 +42,7 @@ export default function ExpenseForm({
   reminderDays,
   onReminderDaysChange,
 }: ExpenseFormProps) {
+  const scrollRef = useRef<ScrollView>(null);
   const [category, setCategory] = useState<ExpenseCategory>("food");
   const [amount, setAmount] = useState("");
   const [itemName, setItemName] = useState("");
@@ -49,6 +50,10 @@ export default function ExpenseForm({
   const [memo, setMemo] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }, []);
 
   useEffect(() => {
     if (editTarget) {
@@ -90,7 +95,10 @@ export default function ExpenseForm({
     setSubmitting(true);
     try {
       await onSubmit(result.data);
-      if (!editTarget) reset();
+      if (!editTarget) {
+        reset();
+        scrollRef.current?.scrollTo({ y: 0, animated: true });
+      }
     } catch (e) {
       Alert.alert("エラー", (e as Error).message);
     } finally {
@@ -99,7 +107,14 @@ export default function ExpenseForm({
   };
 
   return (
-    <ScrollView className="flex-1 p-4">
+    <ScrollView ref={scrollRef} className="flex-1 p-4" keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
+      {editTarget && (
+        <View className="mb-4 rounded-lg px-4 py-3" style={{ backgroundColor: '#FFF8E1' }}>
+          <Text className="text-base font-bold text-amber-700">
+            ✏️ 編集中: {editTarget.itemName}
+          </Text>
+        </View>
+      )}
       <Text className="mb-2 text-base font-medium text-gray-600">カテゴリ</Text>
       <View className="mb-4 flex-row flex-wrap gap-2">
         {EXPENSE_CATEGORIES.map((cat) => (
@@ -129,8 +144,12 @@ export default function ExpenseForm({
         onChangeText={setAmount}
         placeholder="0"
         keyboardType="number-pad"
-        className="mb-4 rounded-lg border border-gray-200 px-3 py-3"
+        className={`rounded-lg border px-3 py-3 ${amount !== "" && Number(amount) <= 0 ? "border-red-400" : "border-gray-200"}`}
       />
+      {amount !== "" && Number(amount) <= 0 && (
+        <Text className="mt-1 text-sm text-red-500">1円以上を入力してください</Text>
+      )}
+      <View className="mb-4" />
 
       <Text className="mb-2 text-base font-medium text-gray-600">日付</Text>
       <Pressable
@@ -183,9 +202,9 @@ export default function ExpenseForm({
 
       <Pressable
         onPress={handleSubmit}
-        disabled={submitting}
+        disabled={submitting || (amount !== "" && Number(amount) <= 0)}
         className="rounded-lg bg-red-400 py-4"
-        style={{ opacity: submitting ? 0.5 : 1 }}
+        style={{ opacity: submitting || (amount !== "" && Number(amount) <= 0) ? 0.5 : 1 }}
       >
         <Text className="text-center text-lg font-bold text-white">
           {editTarget ? "更新する" : "登録する"}

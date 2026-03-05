@@ -16,6 +16,7 @@ interface InventoryFormProps {
     itemName: string;
     category: ExpenseCategory;
     status: InventoryStatus;
+    reminderDays?: number;
   }) => Promise<void>;
   onCancel: () => void;
 }
@@ -24,6 +25,7 @@ export default function InventoryForm({ onSubmit, onCancel }: InventoryFormProps
   const [category, setCategory] = useState<ExpenseCategory>("food");
   const [itemName, setItemName] = useState("");
   const [status, setStatus] = useState<InventoryStatus>("sufficient");
+  const [reminderDays, setReminderDays] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
@@ -34,10 +36,12 @@ export default function InventoryForm({ onSubmit, onCancel }: InventoryFormProps
 
     setSubmitting(true);
     try {
+      const parsed = parseInt(reminderDays, 10);
       await onSubmit({
         itemName: itemName.trim(),
         category,
         status,
+        ...(parsed > 0 ? { reminderDays: parsed } : {}),
       });
     } catch (e) {
       Alert.alert("エラー", (e as Error).message);
@@ -47,7 +51,13 @@ export default function InventoryForm({ onSubmit, onCancel }: InventoryFormProps
   };
 
   return (
-    <ScrollView className="flex-1 p-4">
+    <ScrollView className="flex-1 p-4" keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
+      <View className="mb-4 rounded-lg bg-blue-50 p-3">
+        <Text className="text-sm text-blue-700">
+          📦 購入せず手元にあるものを在庫として登録します。{"\n"}購入した場合は「＋」ボタンから支出登録してください。
+        </Text>
+      </View>
+
       <Text className="mb-2 text-base font-medium text-gray-600">カテゴリ</Text>
       <View className="mb-4 flex-row flex-wrap gap-2">
         {EXPENSE_CATEGORIES.map((cat) => (
@@ -67,7 +77,7 @@ export default function InventoryForm({ onSubmit, onCancel }: InventoryFormProps
       <TextInput
         value={itemName}
         onChangeText={setItemName}
-        placeholder="例: ロイヤルカナン インドア 2kg"
+        placeholder="例: もらったフード、ストックの猫砂"
         className="mb-4 rounded-lg border border-gray-200 px-3 py-3"
       />
 
@@ -92,13 +102,22 @@ export default function InventoryForm({ onSubmit, onCancel }: InventoryFormProps
         ))}
       </View>
 
+      <Text className="mb-2 text-base font-medium text-gray-600">通知設定 (日・任意)</Text>
+      <TextInput
+        value={reminderDays}
+        onChangeText={setReminderDays}
+        placeholder="例: 30"
+        keyboardType="number-pad"
+        className="mb-6 rounded-lg border border-gray-200 px-3 py-3"
+      />
+
       <Pressable
         onPress={handleSubmit}
         disabled={submitting}
         className="rounded-lg bg-red-400 py-4"
         style={{ opacity: submitting ? 0.5 : 1 }}
       >
-        <Text className="text-center text-lg font-bold text-white">追加する</Text>
+        <Text className="text-center text-lg font-bold text-white">手持ちを登録</Text>
       </Pressable>
 
       <Pressable onPress={onCancel} className="mt-3 py-3">

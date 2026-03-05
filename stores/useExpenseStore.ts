@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import { Platform } from "react-native";
 import * as SQLite from "expo-sqlite";
-import type { Expense, CreateExpenseInput, UpdateExpenseInput, DashboardSummary } from "../types/expense";
+import type { Expense, CreateExpenseInput, UpdateExpenseInput, DashboardSummary, ExpenseCategory } from "../types/expense";
 import { initDatabase } from "../db/schema";
 import { createExpense, getExpensesByMonth, getExpensesByMonthAndCategory, updateExpense, deleteExpense } from "../db/expenses";
-import { getDashboardSummary } from "../db/dashboard";
+import { getDashboardSummary, getLast12MonthsByCategory } from "../db/dashboard";
 import { format } from "date-fns";
 
 interface ExpenseStore {
@@ -12,6 +12,7 @@ interface ExpenseStore {
   ready: boolean;
   expenses: Expense[];
   summary: DashboardSummary | null;
+  yearlyByCategory: Partial<Record<ExpenseCategory, number>>;
   currentMonth: string;
   loading: boolean;
   error: string | null;
@@ -20,6 +21,7 @@ interface ExpenseStore {
   setMonth: (month: string) => void;
   fetchExpenses: (category?: string) => Promise<void>;
   fetchSummary: () => Promise<void>;
+  fetchYearlyByCategory: () => Promise<void>;
   addExpense: (input: CreateExpenseInput, linkInventory?: boolean) => Promise<Expense>;
   editExpense: (id: string, input: UpdateExpenseInput) => Promise<void>;
   removeExpense: (id: string) => Promise<void>;
@@ -30,6 +32,7 @@ export const useExpenseStore = create<ExpenseStore>((set, get) => ({
   ready: false,
   expenses: [],
   summary: null,
+  yearlyByCategory: {},
   currentMonth: format(new Date(), "yyyy-MM"),
   loading: false,
   error: null,
@@ -79,6 +82,17 @@ export const useExpenseStore = create<ExpenseStore>((set, get) => ({
     try {
       const summary = await getDashboardSummary(db, currentMonth);
       set({ summary });
+    } catch (e) {
+      set({ error: (e as Error).message });
+    }
+  },
+
+  fetchYearlyByCategory: async () => {
+    const { db } = get();
+    if (!db) return;
+    try {
+      const yearlyByCategory = await getLast12MonthsByCategory(db);
+      set({ yearlyByCategory });
     } catch (e) {
       set({ error: (e as Error).message });
     }

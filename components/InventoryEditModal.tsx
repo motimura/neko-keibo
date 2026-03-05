@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, Pressable, Modal, Alert } from "react-native";
+import { View, Text, Pressable, Modal, Alert, TextInput, Keyboard, TouchableWithoutFeedback } from "react-native";
 import type { InventoryItem, InventoryStatus } from "../types/inventory";
 import {
   INVENTORY_STATUS_LABELS,
@@ -17,6 +17,8 @@ interface InventoryEditModalProps {
   onSave: (id: string, updates: { status?: InventoryStatus }) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   onRepurchase: (item: InventoryItem) => Promise<void>;
+  onUpdateReminder: (id: string, days: number | null) => Promise<void>;
+  reminderDays?: number | null;
 }
 
 export default function InventoryEditModal({
@@ -26,13 +28,17 @@ export default function InventoryEditModal({
   onSave,
   onDelete,
   onRepurchase,
+  onUpdateReminder,
+  reminderDays,
 }: InventoryEditModalProps) {
   const [status, setStatus] = useState<InventoryStatus>("sufficient");
+  const [editReminderDays, setEditReminderDays] = useState("");
   const [saving, setSaving] = useState(false);
 
   const handleOpen = () => {
     if (item) {
       setStatus(item.status);
+      setEditReminderDays(reminderDays ? String(reminderDays) : "");
     }
   };
 
@@ -41,6 +47,11 @@ export default function InventoryEditModal({
     setSaving(true);
     try {
       await onSave(item.id, { status });
+      const newDays = editReminderDays ? parseInt(editReminderDays, 10) : null;
+      const oldDays = reminderDays ?? null;
+      if (newDays !== oldDays) {
+        await onUpdateReminder(item.id, newDays);
+      }
       onClose();
     } catch (e) {
       Alert.alert("エラー", (e as Error).message);
@@ -74,6 +85,7 @@ export default function InventoryEditModal({
       onShow={handleOpen}
       onRequestClose={onClose}
     >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View className="flex-1 bg-white p-4">
         <View className="mb-6 flex-row items-center justify-between">
           <Text className="text-xl font-bold">在庫詳細</Text>
@@ -101,6 +113,20 @@ export default function InventoryEditModal({
           )}
         </View>
 
+        <Text className="mb-2 text-base font-medium text-gray-600">通知周期</Text>
+        <View className="mb-4 flex-row items-center gap-2">
+          <TextInput
+            className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-base"
+            value={editReminderDays}
+            onChangeText={(t) => setEditReminderDays(t.replace(/[^0-9]/g, ""))}
+            keyboardType="number-pad"
+            placeholder="未設定"
+            placeholderTextColor="#9ca3af"
+            maxLength={3}
+          />
+          <Text className="text-base text-gray-600">日</Text>
+        </View>
+
         <Text className="mb-2 text-base font-medium text-gray-600">ステータス</Text>
         <View className="mb-6 flex-row gap-2">
           {INVENTORY_STATUSES.map((s) => (
@@ -120,6 +146,12 @@ export default function InventoryEditModal({
               </Text>
             </Pressable>
           ))}
+        </View>
+
+        <View className="mb-3 rounded-lg bg-gray-50 p-3">
+          <Text className="text-sm text-gray-500">
+            💡 新しく購入した場合は「同じものを購入」か、ホームの「＋」から支出登録してください
+          </Text>
         </View>
 
         <Pressable
@@ -163,6 +195,7 @@ export default function InventoryEditModal({
           <Text className="text-center text-red-500">削除する</Text>
         </Pressable>
       </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 }

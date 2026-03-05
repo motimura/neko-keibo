@@ -37,6 +37,21 @@ export async function getPrevMonthTotal(
   return row?.total ?? 0;
 }
 
+export async function getLast12MonthsByCategory(
+  db: SQLite.SQLiteDatabase
+): Promise<Partial<Record<ExpenseCategory, number>>> {
+  const since = format(subMonths(new Date(), 11), "yyyy-MM");
+  const rows = await db.getAllAsync<{ category: string; total: number }>(
+    `SELECT category, SUM(amount) as total FROM expenses WHERE substr(expense_date, 1, 7) >= ? GROUP BY category ORDER BY total DESC`,
+    [since]
+  );
+  const result: Partial<Record<ExpenseCategory, number>> = {};
+  for (const row of rows) {
+    result[row.category as ExpenseCategory] = row.total;
+  }
+  return result;
+}
+
 export async function getDashboardSummary(
   db: SQLite.SQLiteDatabase,
   month: string

@@ -48,8 +48,11 @@ export default function ReminderSetting({
         setValue(String(days));
         setUnit("days");
       }
+    } else {
+      setValue("");
+      setUnit("days");
     }
-  }, []);
+  }, [days]);
 
   const handleValueChange = (text: string) => {
     setValue(text);
@@ -107,6 +110,11 @@ export default function ReminderSetting({
               </Pressable>
             ))}
           </View>
+          {unit !== "days" && parseInt(value, 10) > 0 && (
+            <Text className="mt-2 text-sm text-gray-500">
+              = {toDays(parseInt(value, 10), unit)}日後に通知
+            </Text>
+          )}
         </View>
       )}
     </View>

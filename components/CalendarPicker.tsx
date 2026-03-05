@@ -11,6 +11,8 @@ import {
   subMonths,
   isSameMonth,
   isSameDay,
+  isAfter,
+  startOfDay,
 } from "date-fns";
 import { ja } from "date-fns/locale";
 
@@ -26,6 +28,8 @@ interface CalendarPickerProps {
 export default function CalendarPicker({ visible, date, onConfirm, onCancel }: CalendarPickerProps) {
   const [viewMonth, setViewMonth] = useState(date);
   const [selected, setSelected] = useState(date);
+  const today = startOfDay(new Date());
+  const isAtOrAfterCurrentMonth = isSameMonth(viewMonth, today) || isAfter(startOfMonth(viewMonth), today);
 
   const days = useMemo(() => {
     const start = startOfWeek(startOfMonth(viewMonth), { weekStartsOn: 0 });
@@ -44,13 +48,19 @@ export default function CalendarPicker({ visible, date, onConfirm, onCancel }: C
       <Pressable onPress={onCancel} className="flex-1 items-center justify-center bg-black/40">
         <Pressable onPress={() => {}} className="mx-6 w-80 rounded-2xl bg-white p-4">
           <View className="mb-3 flex-row items-center justify-between">
-            <Pressable onPress={() => setViewMonth(subMonths(viewMonth, 1))} className="px-3 py-1">
+            <Pressable onPress={() => setViewMonth(subMonths(viewMonth, 1))} className="px-3 py-1" hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
               <Text className="text-2xl">◀</Text>
             </Pressable>
             <Text className="text-lg font-bold">
               {format(viewMonth, "yyyy年M月", { locale: ja })}
             </Text>
-            <Pressable onPress={() => setViewMonth(addMonths(viewMonth, 1))} className="px-3 py-1">
+            <Pressable
+              onPress={() => setViewMonth(addMonths(viewMonth, 1))}
+              disabled={isAtOrAfterCurrentMonth}
+              className="px-3 py-1"
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={{ opacity: isAtOrAfterCurrentMonth ? 0.3 : 1 }}
+            >
               <Text className="text-2xl">▶</Text>
             </Pressable>
           </View>
@@ -69,31 +79,36 @@ export default function CalendarPicker({ visible, date, onConfirm, onCancel }: C
             {days.map((day, idx) => {
               const isCurrentMonth = isSameMonth(day, viewMonth);
               const isSelected = isSameDay(day, selected);
+              const isFuture = isAfter(startOfDay(day), today);
               const dayOfWeek = day.getDay();
               return (
                 <Pressable
                   key={idx}
                   onPress={() => {
+                    if (isFuture) return;
                     setSelected(day);
                     if (!isCurrentMonth) setViewMonth(day);
                   }}
+                  disabled={isFuture}
                   className="items-center justify-center"
-                  style={{ width: "14.28%", height: 40 }}
+                  style={{ width: "14.28%", height: 40, opacity: isFuture ? 0.3 : 1 }}
                 >
                   <View
-                    className={`h-8 w-8 items-center justify-center rounded-full ${isSelected ? "bg-red-400" : ""}`}
+                    className={`h-8 w-8 items-center justify-center rounded-full ${isSelected && !isFuture ? "bg-red-400" : ""}`}
                   >
                     <Text
                       className={`text-base ${
-                        isSelected
-                          ? "font-bold text-white"
-                          : !isCurrentMonth
-                            ? "text-gray-300"
-                            : dayOfWeek === 0
-                              ? "text-red-400"
-                              : dayOfWeek === 6
-                                ? "text-blue-400"
-                                : "text-gray-800"
+                        isFuture
+                          ? "text-gray-300"
+                          : isSelected
+                            ? "font-bold text-white"
+                            : !isCurrentMonth
+                              ? "text-gray-300"
+                              : dayOfWeek === 0
+                                ? "text-red-400"
+                                : dayOfWeek === 6
+                                  ? "text-blue-400"
+                                  : "text-gray-800"
                       }`}
                     >
                       {day.getDate()}
@@ -105,10 +120,16 @@ export default function CalendarPicker({ visible, date, onConfirm, onCancel }: C
           </View>
 
           <View className="mt-3 flex-row items-center justify-between">
-            <Pressable onPress={() => setViewMonth(subMonths(viewMonth, 1))} className="rounded-lg bg-gray-100 px-4 py-2">
+            <Pressable onPress={() => setViewMonth(subMonths(viewMonth, 1))} className="rounded-lg bg-gray-100 px-4 py-2" hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
               <Text className="text-base text-gray-600">◀ 前月</Text>
             </Pressable>
-            <Pressable onPress={() => setViewMonth(addMonths(viewMonth, 1))} className="rounded-lg bg-gray-100 px-4 py-2">
+            <Pressable
+              onPress={() => setViewMonth(addMonths(viewMonth, 1))}
+              disabled={isAtOrAfterCurrentMonth}
+              className="rounded-lg bg-gray-100 px-4 py-2"
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={{ opacity: isAtOrAfterCurrentMonth ? 0.3 : 1 }}
+            >
               <Text className="text-base text-gray-600">翌月 ▶</Text>
             </Pressable>
           </View>

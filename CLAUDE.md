@@ -245,6 +245,8 @@ npm run lint
 
 CLAUDE.md が古いと Claude Code が誤った前提でコードを生成するため、コードの変更とセットで更新する。
 
+**README.md も同時に更新すること。** README.md はユーザー向けの仕様書を兼ねているため、機能追加・変更・削除があった場合は CLAUDE.md と README.md の両方を更新する。
+
 ## v1 (Web版) からの変更履歴
 
 - v1: React (Vite) + AWS サーバーレス（DynamoDB + Lambda + API Gateway）

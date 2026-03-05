@@ -36,6 +36,9 @@ export default function AddScreen() {
       await editExpense(expense.id, { notificationId });
     }
 
+    setReminderEnabled(false);
+    setReminderDays(null);
+    setLinkInventory(true);
     router.back();
   };
 

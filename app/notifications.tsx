@@ -38,7 +38,10 @@ function NotificationCard({
           <Text className="text-center text-base font-bold text-white">同じものを購入</Text>
         </Pressable>
 
-        <Pressable className="rounded-lg bg-gray-200 px-4 py-2">
+        <Pressable
+          onPress={() => Alert.alert("通知を保留しました", "あとで通知一覧から対応できます")}
+          className="rounded-lg bg-gray-200 px-4 py-2"
+        >
           <Text className="text-center text-base text-gray-600">あとで</Text>
         </Pressable>
 
