@@ -2,11 +2,12 @@
   "expo": {
     "name": "猫計簿",
     "slug": "neko-keibo",
-    "version": "2.0.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "scheme": "neko-keibo",
+    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -14,10 +15,16 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.nekokeibo.app"
+      "bundleIdentifier": "com.nekokeibo.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSUserNotificationsUsageDescription": "買い替え時期のリマインダー通知を送信します"
+      }
     },
     "android": {
       "package": "com.nekokeibo.app",
+      "versionCode": 1,
+      "permissions": [],
       "adaptiveIcon": {
         "backgroundColor": "#F07272",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -28,7 +35,14 @@
     "plugins": [
       "expo-sqlite",
       "expo-router",
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#FF6B6B"
+        }
+      ]
     ]
   }
 }
