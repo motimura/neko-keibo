@@ -93,4 +93,78 @@ describe("validateCreateExpense", () => {
       expect(result.errors.length).toBeGreaterThanOrEqual(3);
     }
   });
+
+  // --- Boundary tests ---
+
+  it("超長い品名（1000文字）を受け付ける", () => {
+    const longName = "あ".repeat(1000);
+    const result = validateCreateExpense({ ...validInput, itemName: longName });
+    expect(result).toHaveProperty("data");
+    if ("data" in result) {
+      expect(result.data.itemName).toBe(longName);
+    }
+  });
+
+  it("高額（10,000,000以上）の金額を受け付ける", () => {
+    const result = validateCreateExpense({ ...validInput, amount: 10000000 });
+    expect(result).toHaveProperty("data");
+    if ("data" in result) {
+      expect(result.data.amount).toBe(10000000);
+    }
+  });
+
+  it("非常に大きい金額（Number.MAX_SAFE_INTEGER）を受け付ける", () => {
+    const result = validateCreateExpense({ ...validInput, amount: Number.MAX_SAFE_INTEGER });
+    expect(result).toHaveProperty("data");
+    if ("data" in result) {
+      expect(result.data.amount).toBe(Number.MAX_SAFE_INTEGER);
+    }
+  });
+
+  it("Unicode/絵文字の品名を受け付ける", () => {
+    const emojiName = "🐱フード🍗プレミアム";
+    const result = validateCreateExpense({ ...validInput, itemName: emojiName });
+    expect(result).toHaveProperty("data");
+    if ("data" in result) {
+      expect(result.data.itemName).toBe(emojiName);
+    }
+  });
+
+  it("存在しない日付（2026-02-30）はregexのみなので通過する", () => {
+    const result = validateCreateExpense({ ...validInput, expenseDate: "2026-02-30" });
+    // Current validator only checks YYYY-MM-DD regex format, not date validity
+    expect(result).toHaveProperty("data");
+    if ("data" in result) {
+      expect(result.data.expenseDate).toBe("2026-02-30");
+    }
+  });
+
+  it("空オブジェクト{}は全フィールドのエラーを返す", () => {
+    const result = validateCreateExpense({});
+    expect(result).toHaveProperty("errors");
+    if ("errors" in result) {
+      const fields = result.errors.map((e) => e.field);
+      expect(fields).toContain("category");
+      expect(fields).toContain("amount");
+      expect(fields).toContain("itemName");
+      expect(fields).toContain("expenseDate");
+      expect(result.errors.length).toBe(4);
+    }
+  });
+
+  it("金額1（最小有効値）を受け付ける", () => {
+    const result = validateCreateExpense({ ...validInput, amount: 1 });
+    expect(result).toHaveProperty("data");
+    if ("data" in result) {
+      expect(result.data.amount).toBe(1);
+    }
+  });
+
+  it("全カテゴリを受け付ける", () => {
+    const categories = ["food", "litter", "medical", "toy", "goods", "grooming", "other"] as const;
+    for (const cat of categories) {
+      const result = validateCreateExpense({ ...validInput, category: cat });
+      expect(result).toHaveProperty("data");
+    }
+  });
 });

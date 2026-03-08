@@ -188,28 +188,36 @@ export async function exportToJSON(db: SQLite.SQLiteDatabase): Promise<void> {
   const data = buildExportJSON(expenses, inventory, notifications);
   const json = JSON.stringify(data, null, 2);
   const fileName = `neko-keibo-backup-${format(new Date(), "yyyy-MM-dd")}.json`;
-  const file = new File(Paths.cache, fileName);
 
-  file.write(json);
-  await shareAsync(file.uri, {
-    mimeType: "application/json",
-    dialogTitle: "猫計簿バックアップ",
-    UTI: "public.json",
-  });
+  try {
+    const file = new File(Paths.cache, fileName);
+    file.write(json);
+    await shareAsync(file.uri, {
+      mimeType: "application/json",
+      dialogTitle: "猫計簿バックアップ",
+      UTI: "public.json",
+    });
+  } catch (e) {
+    throw new Error(`JSONエクスポートに失敗しました: ${(e as Error).message}`);
+  }
 }
 
 export async function exportToCSV(db: SQLite.SQLiteDatabase): Promise<void> {
   const expenses = await getAllExpenses(db);
   const csv = buildExportCSV(expenses);
   const fileName = `neko-keibo-backup-${format(new Date(), "yyyy-MM-dd")}.csv`;
-  const file = new File(Paths.cache, fileName);
 
-  file.write(csv);
-  await shareAsync(file.uri, {
-    mimeType: "text/csv",
-    dialogTitle: "猫計簿 CSVエクスポート",
-    UTI: "public.comma-separated-values-text",
-  });
+  try {
+    const file = new File(Paths.cache, fileName);
+    file.write(csv);
+    await shareAsync(file.uri, {
+      mimeType: "text/csv",
+      dialogTitle: "猫計簿 CSVエクスポート",
+      UTI: "public.comma-separated-values-text",
+    });
+  } catch (e) {
+    throw new Error(`CSVエクスポートに失敗しました: ${(e as Error).message}`);
+  }
 }
 
 export async function getDataCounts(

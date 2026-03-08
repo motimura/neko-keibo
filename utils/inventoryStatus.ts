@@ -68,7 +68,9 @@ export async function refreshAllInventoryStatuses(
             content: { title: "🐱 猫計簿", body },
             trigger: null,
           });
-        } catch {}
+        } catch {
+          // 通知スケジュール失敗は在庫ステータス更新に影響させない
+        }
       }
     }
   }

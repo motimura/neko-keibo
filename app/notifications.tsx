@@ -106,9 +106,12 @@ export default function NotificationsScreen() {
 
   if (notifications.length === 0) {
     return (
-      <View className="flex-1 items-center justify-center bg-gray-50">
+      <View className="flex-1 items-center justify-center bg-gray-50 px-8">
         <Text className="text-xl">🎉</Text>
         <Text className="mt-2 text-gray-400">通知はありません</Text>
+        <Text className="mt-2 text-center text-sm text-gray-300">
+          支出登録時に通知を設定すると、ここに表示されます
+        </Text>
       </View>
     );
   }

@@ -73,6 +73,10 @@ neko-keibo/
 │   ├── export.ts               # データエクスポート（JSON/CSV）
 │   └── import.ts               # データインポート（JSON/CSV）
 ├── __tests__/                  # テスト
+├── docs/                       # GitHub Pages（プライバシーポリシー公開用）
+│   └── index.md
+├── PRIVACY_POLICY.md           # プライバシーポリシー（日英）
+├── STORE_LISTING.md            # ストア掲載情報
 ├── app.json                    # Expo設定
 ├── eas.json                    # EAS Build設定
 ├── package.json
@@ -193,8 +197,8 @@ CREATE TABLE IF NOT EXISTS inventory (
 - **Phase 1**: 支出記録 + ダッシュボード（SQLite CRUD + グラフ表示）✅
 - **Phase 2**: 消耗品の在庫管理 ✅
 - **Phase 3**: 買い替えリマインダー（expo-notifications によるローカル通知）✅
-- **Phase 4**: データエクスポート/インポート（JSON/CSV）← 現在（実装済み）
-- **Phase 5**: ストア公開（EAS Submit で App Store / Google Play）
+- **Phase 4**: データエクスポート/インポート（JSON/CSV）✅
+- **Phase 5**: ストア公開（EAS Submit で App Store / Google Play）← 現在
 
 ## コマンド
 

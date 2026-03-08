@@ -16,7 +16,10 @@ export async function scheduleReminder(
   categoryEmoji: string,
   days: number,
   expenseId?: string
-): Promise<string> {
+): Promise<string | null> {
+  const { status } = await Notifications.getPermissionsAsync();
+  if (status !== "granted") return null;
+
   const id = await Notifications.scheduleNotificationAsync({
     content: {
       title: "🐱 猫計簿",
@@ -41,7 +44,7 @@ export async function rescheduleReminder(
   categoryEmoji: string,
   days: number,
   expenseId?: string
-): Promise<string> {
+): Promise<string | null> {
   if (oldNotificationId) {
     await cancelReminder(oldNotificationId).catch(() => {});
   }
@@ -67,11 +70,15 @@ export async function rescheduleAllReminders(db: SQLite.SQLiteDatabase): Promise
 
     try {
       const newId = await scheduleReminder(itemName, emoji, reminderDays, expenseId);
-      await db.runAsync(
-        `UPDATE expenses SET notification_id = ? WHERE id = ?`,
-        [newId, expenseId]
-      );
-    } catch {}
+      if (newId) {
+        await db.runAsync(
+          `UPDATE expenses SET notification_id = ? WHERE id = ?`,
+          [newId, expenseId]
+        );
+      }
+    } catch {
+      // 個別の通知スケジュール失敗は無視して続行
+    }
   }
 }
 

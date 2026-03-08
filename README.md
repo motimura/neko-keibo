@@ -3,6 +3,13 @@
 猫にかかる費用や消耗品の在庫を管理するモバイルアプリ。
 iOS / Android 両対応。ローカルファーストで端末内にデータを保存し、オフラインで完全に動作します。
 
+## スクリーンショット
+
+<!-- TODO: アプリのスクリーンショットを追加 -->
+<!-- | ホーム | 支出登録 | 在庫管理 | 通知 | 設定 | -->
+<!-- |--------|----------|----------|------|------| -->
+<!-- | ![Home](docs/screenshots/home.png) | ![Add](docs/screenshots/add.png) | ![Inventory](docs/screenshots/inventory.png) | ![Notifications](docs/screenshots/notifications.png) | ![Settings](docs/screenshots/settings.png) | -->
+
 ## 機能一覧
 
 ### 支出管理

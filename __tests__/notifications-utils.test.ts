@@ -4,6 +4,7 @@ jest.mock("expo-crypto", () => ({
 
 jest.mock("expo-notifications", () => ({
   requestPermissionsAsync: jest.fn(() => Promise.resolve({ status: "granted" })),
+  getPermissionsAsync: jest.fn(() => Promise.resolve({ status: "granted" })),
   scheduleNotificationAsync: jest.fn(() => Promise.resolve("mock-notif-id")),
   cancelScheduledNotificationAsync: jest.fn(() => Promise.resolve()),
   getAllScheduledNotificationsAsync: jest.fn(() => Promise.resolve([])),

@@ -24,6 +24,14 @@ jest.mock("react-native-chart-kit", () => ({
   PieChart: () => null,
 }));
 
+jest.mock("expo-notifications", () => ({
+  requestPermissionsAsync: jest.fn(() => Promise.resolve({ status: "granted" })),
+  getPermissionsAsync: jest.fn(() => Promise.resolve({ status: "granted" })),
+  scheduleNotificationAsync: jest.fn(() => Promise.resolve("mock-notif-id")),
+  cancelScheduledNotificationAsync: jest.fn(() => Promise.resolve()),
+  getAllScheduledNotificationsAsync: jest.fn(() => Promise.resolve([])),
+  SchedulableTriggerInputTypes: { TIME_INTERVAL: "timeInterval" },
+}));
 
 import React from "react";
 import { render, screen } from "@testing-library/react-native";
@@ -31,6 +39,10 @@ import Dashboard from "../components/Dashboard";
 import MonthPicker from "../components/MonthPicker";
 import ExpenseList from "../components/ExpenseList";
 import CategoryBadge from "../components/CategoryBadge";
+import InventoryList from "../components/InventoryList";
+import NotificationsScreen from "../app/notifications";
+import { useExpenseStore } from "../stores/useExpenseStore";
+import { useNotificationStore } from "../stores/useNotificationStore";
 
 describe("Dashboard", () => {
   it("summaryがnullの場合ローディング表示", () => {
@@ -118,5 +130,32 @@ describe("CategoryBadge", () => {
     render(<CategoryBadge category="food" />);
     expect(screen.getByText("🍗")).toBeTruthy();
     expect(screen.getByText("フード")).toBeTruthy();
+  });
+});
+
+describe("InventoryList empty state", () => {
+  it("items=[]で空メッセージを表示", () => {
+    render(<InventoryList items={[]} onPress={jest.fn()} />);
+    expect(screen.getByText("在庫アイテムがありません")).toBeTruthy();
+  });
+});
+
+describe("NotificationsScreen empty state", () => {
+  beforeEach(() => {
+    useExpenseStore.setState({ ready: true, db: null });
+    useNotificationStore.setState({
+      notifications: [],
+      pendingCount: 0,
+      loading: false,
+      fetchNotifications: jest.fn(),
+      fetchPendingCount: jest.fn(),
+      repurchase: jest.fn(),
+      dismiss: jest.fn(),
+    });
+  });
+
+  it("notifications=[]で「通知はありません」を表示", () => {
+    render(<NotificationsScreen />);
+    expect(screen.getByText("通知はありません")).toBeTruthy();
   });
 });

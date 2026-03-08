@@ -20,6 +20,7 @@ interface InventoryStore {
   items: InventoryItem[];
   criticalCount: number;
   loading: boolean;
+  error: string | null;
 
   fetchItems: () => Promise<void>;
   addItem: (input: CreateInventoryInput) => Promise<InventoryItem>;
@@ -44,15 +45,18 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
   items: [],
   criticalCount: 0,
   loading: false,
+  error: null,
 
   fetchItems: async () => {
     const db = getDb();
     if (!db) return;
-    set({ loading: true });
+    set({ loading: true, error: null });
     try {
       const items = await getInventoryItems(db);
       const criticalCount = items.filter((i) => i.status === "critical").length;
       set({ items, criticalCount });
+    } catch (e) {
+      set({ error: (e as Error).message });
     } finally {
       set({ loading: false });
     }
@@ -60,28 +64,47 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
 
   addItem: async (input: CreateInventoryInput) => {
     const db = requireDb();
-    const item = await createInventoryItem(db, input);
-    await get().fetchItems();
-    return item;
+    try {
+      const item = await createInventoryItem(db, input);
+      await get().fetchItems();
+      return item;
+    } catch (e) {
+      set({ error: (e as Error).message });
+      throw e;
+    }
   },
 
   editItem: async (id: string, input: UpdateInventoryInput) => {
     const db = requireDb();
-    await updateInventoryItem(db, id, input);
-    await get().fetchItems();
+    try {
+      await updateInventoryItem(db, id, input);
+      await get().fetchItems();
+    } catch (e) {
+      set({ error: (e as Error).message });
+      throw e;
+    }
   },
 
   removeItem: async (id: string) => {
     const db = requireDb();
-    await deleteInventoryItem(db, id);
-    await get().fetchItems();
+    try {
+      await deleteInventoryItem(db, id);
+      await get().fetchItems();
+    } catch (e) {
+      set({ error: (e as Error).message });
+      throw e;
+    }
   },
 
   refreshStatuses: async () => {
     const db = getDb();
     if (!db) return;
-    await refreshAllInventoryStatuses(db);
-    await get().fetchItems();
+    try {
+      await refreshAllInventoryStatuses(db);
+      await get().fetchItems();
+    } catch (e) {
+      set({ error: (e as Error).message });
+    }
   },
 
   linkPurchase: async (itemName: string, category: ExpenseCategory, expenseDate: string) => {
@@ -153,8 +176,10 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
         oldReminderDays,
         newExpense.id
       );
-      const { updateExpense } = require("../db/expenses");
-      await updateExpense(db, newExpense.id, { notificationId });
+      if (notificationId) {
+        const { updateExpense } = require("../db/expenses");
+        await updateExpense(db, newExpense.id, { notificationId });
+      }
     }
 
     await get().fetchItems();

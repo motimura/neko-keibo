@@ -72,7 +72,7 @@ export default function InventoryScreen() {
         emoji,
         days,
         expense.id
-      );
+      ) ?? null;
     }
 
     // Update expense
@@ -114,7 +114,9 @@ export default function InventoryScreen() {
                 data.reminderDays,
                 expense.id
               );
-              await updateExpense(db, expense.id, { notificationId });
+              if (notificationId) {
+                await updateExpense(db, expense.id, { notificationId });
+              }
             }
           }
           setShowForm(false);

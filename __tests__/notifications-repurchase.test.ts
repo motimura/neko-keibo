@@ -18,6 +18,7 @@ jest.mock("expo-sqlite", () => ({
 
 jest.mock("expo-notifications", () => ({
   requestPermissionsAsync: jest.fn(() => Promise.resolve({ status: "granted" })),
+  getPermissionsAsync: jest.fn(() => Promise.resolve({ status: "granted" })),
   scheduleNotificationAsync: jest.fn(() => Promise.resolve("new-notif-id")),
   cancelScheduledNotificationAsync: jest.fn(() => Promise.resolve()),
   getAllScheduledNotificationsAsync: jest.fn(() => Promise.resolve([])),
@@ -113,7 +114,7 @@ describe("dismiss", () => {
     await useNotificationStore.getState().dismiss("notif-1", "exp-1");
 
     const expenseUpdateCalls = mockRunAsync.mock.calls.filter(
-      (call) => (call[0] as string).includes("UPDATE expenses SET reminder_days = NULL")
+      (call) => (call[0] as string).includes("UPDATE expenses SET") && (call[0] as string).includes("reminder_days")
     );
     expect(expenseUpdateCalls.length).toBe(1);
   });

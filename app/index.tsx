@@ -112,6 +112,17 @@ export default function HomeScreen() {
           <MonthPicker month={currentMonth} onChangeMonth={setMonth} />
           <Dashboard summary={summary} />
 
+          {summary && summary.totalAmount === 0 && yearlyTotal === 0 && (
+            <View className="mx-4 mb-4 items-center rounded-xl bg-white p-6 shadow-sm">
+              <Pressable
+                onPress={() => router.push("/add")}
+                className="rounded-lg bg-red-400 px-6 py-3"
+              >
+                <Text className="text-base font-bold text-white">最初の支出を記録する</Text>
+              </Pressable>
+            </View>
+          )}
+
           {yearlyTotal > 0 && (
             <View className="mx-4 mb-4 rounded-xl bg-white p-4 shadow-sm">
               <Text className="mb-3 text-base font-medium text-gray-500">

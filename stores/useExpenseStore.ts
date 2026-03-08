@@ -39,7 +39,6 @@ export const useExpenseStore = create<ExpenseStore>((set, get) => ({
 
   init: async () => {
     if (Platform.OS === "web") {
-      console.warn("expo-sqlite is not supported on web. Use iOS/Android simulator or Expo Go.");
       set({
         ready: true,
         summary: {

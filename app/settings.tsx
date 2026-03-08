@@ -31,13 +31,21 @@ export default function SettingsScreen() {
   const handleExportJSON = () =>
     withBusy(async () => {
       if (!db) return;
-      await exportToJSON(db);
+      try {
+        await exportToJSON(db);
+      } catch (e) {
+        Alert.alert("エクスポートエラー", (e as Error).message);
+      }
     });
 
   const handleExportCSV = () =>
     withBusy(async () => {
       if (!db) return;
-      await exportToCSV(db);
+      try {
+        await exportToCSV(db);
+      } catch (e) {
+        Alert.alert("エクスポートエラー", (e as Error).message);
+      }
     });
 
   const handleImportJSON = () => {

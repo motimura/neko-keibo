@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Pressable, Text } from "react-native";
+import { View, Pressable, Text, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useExpenseStore } from "../stores/useExpenseStore";
@@ -33,13 +33,19 @@ export default function AddScreen() {
         finalReminderDays,
         expense.id
       );
-      await editExpense(expense.id, { notificationId });
+      if (notificationId) {
+        await editExpense(expense.id, { notificationId });
+      } else {
+        Alert.alert("通知の権限がないため通知は設定されませんでした");
+      }
     }
 
     setReminderEnabled(false);
     setReminderDays(null);
     setLinkInventory(true);
-    router.back();
+    Alert.alert("登録完了", "支出を記録しました", [
+      { text: "OK", onPress: () => router.back() },
+    ]);
   };
 
   const handleCategoryChange = (cat: ExpenseCategory) => {

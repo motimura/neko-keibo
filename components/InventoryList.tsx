@@ -40,6 +40,9 @@ export default function InventoryList({ items, onPress }: InventoryListProps) {
       <View className="flex-1 items-center justify-center p-8">
         <Text className="text-xl">📦</Text>
         <Text className="mt-2 text-gray-400">在庫アイテムがありません</Text>
+        <Text className="mt-2 text-center text-sm text-gray-300">
+          フード・猫砂の支出を登録すると自動で追加されます
+        </Text>
       </View>
     );
   }
