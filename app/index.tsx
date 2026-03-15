@@ -19,7 +19,6 @@ export default function HomeScreen() {
   const monthRef = useRef(currentMonth);
   monthRef.current = currentMonth;
   const translateX = useRef(new Animated.Value(0)).current;
-  const opacity = useRef(new Animated.Value(1)).current;
   const swipingRef = useRef(false);
 
   const panResponder = useMemo(
@@ -40,13 +39,10 @@ export default function HomeScreen() {
               duration: 150,
               useNativeDriver: true,
             }).start(() => {
-              opacity.setValue(0);
-              translateX.setValue(0);
               setMonth(format(subMonths(cur, 1), "yyyy-MM"));
-              requestAnimationFrame(() => {
-                Animated.timing(opacity, { toValue: 1, duration: 150, useNativeDriver: true }).start(() => {
-                  swipingRef.current = false;
-                });
+              translateX.setValue(-SCREEN_WIDTH);
+              Animated.timing(translateX, { toValue: 0, duration: 150, useNativeDriver: true }).start(() => {
+                swipingRef.current = false;
               });
             });
           } else if (gs.dx < -50) {
@@ -58,13 +54,10 @@ export default function HomeScreen() {
                 duration: 150,
                 useNativeDriver: true,
               }).start(() => {
-                opacity.setValue(0);
-                translateX.setValue(0);
                 setMonth(format(addMonths(cur, 1), "yyyy-MM"));
-                requestAnimationFrame(() => {
-                  Animated.timing(opacity, { toValue: 1, duration: 150, useNativeDriver: true }).start(() => {
-                    swipingRef.current = false;
-                  });
+                translateX.setValue(SCREEN_WIDTH);
+                Animated.timing(translateX, { toValue: 0, duration: 150, useNativeDriver: true }).start(() => {
+                  swipingRef.current = false;
                 });
               });
             } else {
@@ -81,7 +74,7 @@ export default function HomeScreen() {
           }
         },
       }),
-    [setMonth, translateX, opacity]
+    [setMonth, translateX]
   );
 
   useFocusEffect(
@@ -98,7 +91,7 @@ export default function HomeScreen() {
 
   return (
     <View className="flex-1 bg-gray-50">
-      <Animated.View style={{ flex: 1, transform: [{ translateX }], opacity }}>
+      <Animated.View style={{ flex: 1, transform: [{ translateX }] }}>
         <ScrollView className="flex-1" {...panResponder.panHandlers}>
           {criticalCount > 0 && (
             <Link href="/(records)/inventory" asChild>

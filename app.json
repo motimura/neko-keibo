@@ -43,6 +43,13 @@
           "color": "#FF6B6B"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "685fb988-7e63-4611-8994-9afc5a8a3cf0"
+      }
+    },
+    "owner": "saitohcat"
   }
 }
