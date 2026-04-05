@@ -5,6 +5,7 @@ import {
   getPendingNotifications,
   getNotificationCount,
   updateNotificationStatus,
+  snoozeNotification,
 } from "../db/notifications";
 import { createExpense, updateExpense } from "../db/expenses";
 import { scheduleReminder, cancelReminder } from "../utils/notifications";
@@ -20,6 +21,7 @@ interface NotificationStore {
   fetchNotifications: () => Promise<void>;
   fetchPendingCount: () => Promise<void>;
   repurchase: (notification: NotificationRecord) => Promise<void>;
+  snooze: (id: string, days: number) => Promise<void>;
   dismiss: (id: string, expenseId?: string) => Promise<void>;
 }
 
@@ -85,6 +87,18 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
         .getState()
         .linkPurchase(notification.itemName, notification.category, today);
 
+      await get().fetchNotifications();
+    } catch (e) {
+      set({ error: (e as Error).message });
+      throw e;
+    }
+  },
+
+  snooze: async (id: string, days: number) => {
+    const db = getDb();
+    if (!db) throw new Error("DB not initialized");
+    try {
+      await snoozeNotification(db, id, days);
       await get().fetchNotifications();
     } catch (e) {
       set({ error: (e as Error).message });

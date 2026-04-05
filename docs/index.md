@@ -19,11 +19,6 @@
 - 通知の設定はユーザーが任意で行い、いつでもオフにできます
 - プッシュ通知サーバーは使用していません（全てローカル通知です）
 
-### データのエクスポート
-
-- ユーザーは自身のデータをJSON/CSV形式でエクスポートできます
-- エクスポートされたファイルの管理はユーザーの責任となります
-
 ### お問い合わせ
 
 本プライバシーポリシーに関するご質問は、以下までご連絡ください。
@@ -50,11 +45,6 @@ Neko-Keibo respects user privacy and does not collect any personal information.
 - Local notifications are used for purchase reminder functionality
 - Notification settings are optional and can be turned off at any time
 - No push notification servers are used (all notifications are local)
-
-### Data Export
-
-- Users can export their data in JSON/CSV format
-- Management of exported files is the user's responsibility
 
 ### Contact
 

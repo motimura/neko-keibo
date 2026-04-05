@@ -44,8 +44,10 @@ export async function createNotification(
 export async function getPendingNotifications(
   db: SQLite.SQLiteDatabase
 ): Promise<NotificationRecord[]> {
+  const now = new Date().toISOString();
   const rows = await db.getAllAsync(
-    `SELECT * FROM notifications WHERE status = 'pending' ORDER BY notified_at DESC`
+    `SELECT * FROM notifications WHERE status = 'pending' AND notified_at <= ? ORDER BY notified_at DESC`,
+    [now]
   );
   return (rows as Record<string, unknown>[]).map(rowToNotification);
 }
@@ -53,10 +55,25 @@ export async function getPendingNotifications(
 export async function getNotificationCount(
   db: SQLite.SQLiteDatabase
 ): Promise<number> {
+  const now = new Date().toISOString();
   const row = await db.getFirstAsync(
-    `SELECT COUNT(*) as count FROM notifications WHERE status = 'pending'`
+    `SELECT COUNT(*) as count FROM notifications WHERE status = 'pending' AND notified_at <= ?`,
+    [now]
   );
   return (row as Record<string, unknown>).count as number;
+}
+
+export async function snoozeNotification(
+  db: SQLite.SQLiteDatabase,
+  id: string,
+  days: number
+): Promise<void> {
+  const snoozeUntil = new Date();
+  snoozeUntil.setDate(snoozeUntil.getDate() + days);
+  await db.runAsync(
+    `UPDATE notifications SET notified_at = ? WHERE id = ?`,
+    [snoozeUntil.toISOString(), id]
+  );
 }
 
 export async function updateNotificationStatus(

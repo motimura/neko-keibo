@@ -18,7 +18,8 @@
       "bundleIdentifier": "com.nekokeibo.app",
       "buildNumber": "1",
       "infoPlist": {
-        "NSUserNotificationsUsageDescription": "買い替え時期のリマインダー通知を送信します"
+        "NSUserNotificationsUsageDescription": "買い替え時期のリマインダー通知を送信します",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {

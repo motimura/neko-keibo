@@ -10,10 +10,12 @@ import type { NotificationRecord } from "../types/notification";
 function NotificationCard({
   notification,
   onRepurchase,
+  onSnooze,
   onDismiss,
 }: {
   notification: NotificationRecord;
   onRepurchase: (n: NotificationRecord) => void;
+  onSnooze: (n: NotificationRecord) => void;
   onDismiss: (n: NotificationRecord) => void;
 }) {
   const emoji = CATEGORY_EMOJI[notification.category] || "📦";
@@ -39,7 +41,7 @@ function NotificationCard({
         </Pressable>
 
         <Pressable
-          onPress={() => Alert.alert("通知を保留しました", "あとで通知一覧から対応できます")}
+          onPress={() => onSnooze(notification)}
           className="rounded-lg bg-gray-200 px-4 py-2"
         >
           <Text className="text-center text-base text-gray-600">あとで</Text>
@@ -56,7 +58,7 @@ function NotificationCard({
 export default function NotificationsScreen() {
   const ready = useExpenseStore((s) => s.ready);
   const db = useExpenseStore((s) => s.db);
-  const { notifications, fetchNotifications, repurchase, dismiss } = useNotificationStore();
+  const { notifications, fetchNotifications, repurchase, snooze, dismiss } = useNotificationStore();
 
   useFocusEffect(
     useCallback(() => {
@@ -85,6 +87,22 @@ export default function NotificationsScreen() {
         },
       ]
     );
+  };
+
+  const handleSnooze = (notification: NotificationRecord) => {
+    Alert.alert("あとで通知", `「${notification.itemName}」を3日後に再通知しますか？`, [
+      { text: "キャンセル", style: "cancel" },
+      {
+        text: "3日後に通知",
+        onPress: async () => {
+          try {
+            await snooze(notification.id, 3);
+          } catch (e) {
+            Alert.alert("エラー", (e as Error).message);
+          }
+        },
+      },
+    ]);
   };
 
   const handleDismiss = (notification: NotificationRecord) => {
@@ -128,6 +146,7 @@ export default function NotificationsScreen() {
           <NotificationCard
             notification={item}
             onRepurchase={handleRepurchase}
+            onSnooze={handleSnooze}
             onDismiss={handleDismiss}
           />
         )}
