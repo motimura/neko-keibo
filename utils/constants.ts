@@ -3,7 +3,7 @@ import type { InventoryStatus } from "../types/inventory";
 
 export const CATEGORY_LABELS: Record<ExpenseCategory, string> = {
   food: "フード",
-  litter: "猫砂",
+  litter: "消耗品",
   medical: "医療",
   toy: "おもちゃ",
   goods: "グッズ",
@@ -13,7 +13,7 @@ export const CATEGORY_LABELS: Record<ExpenseCategory, string> = {
 
 export const CATEGORY_EMOJI: Record<ExpenseCategory, string> = {
   food: "🍗",
-  litter: "🪣",
+  litter: "🧻",
   medical: "🏥",
   toy: "🧸",
   goods: "🛏️",

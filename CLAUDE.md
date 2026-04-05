@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS inventory (
 | コード | ラベル | 絵文字 | 色 |
 |--------|--------|--------|------|
 | food | フード | 🍗 | #FF6B6B |
-| litter | 猫砂 | 🪣 | #4ECDC4 |
+| litter | 消耗品 | 🧻 | #4ECDC4 |
 | medical | 医療 | 🏥 | #45B7D1 |
 | toy | おもちゃ | 🧸 | #96CEB4 |
 | goods | グッズ | 🛏️ | #FFEAA7 |
