@@ -1,6 +1,8 @@
-export type CatalogCategory = "food" | "litter";
+import type { ExpenseCategory } from "./expense";
 
-export type CatalogItem = {
+export type CatalogCategory = Extract<ExpenseCategory, "food" | "litter">;
+
+export interface CatalogItem {
   id: string;
   category: CatalogCategory;
   brand: string;
@@ -9,4 +11,4 @@ export type CatalogItem = {
   amount: number;
   displayName: string;
   searchKey: string;
-};
+}
