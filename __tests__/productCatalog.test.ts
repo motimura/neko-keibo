@@ -45,3 +45,29 @@ describe('item ファクトリ', () => {
     expect(i.searchKey).toBe(normalizeQuery('A B C'));
   });
 });
+
+const REQUIRED_FOOD_BRANDS = [
+  'ロイヤルカナン', 'アーテミス', 'ブリスミックス', 'ジウィ', 'キアオラ',
+  'ニュートロ シュプレモ', 'ニュートロ ナチュラルチョイス', 'ニュートロ ワイルドレシピ',
+  'クプレラ', 'フォルツァ10', 'ソリッドゴールド', 'アニモンダ',
+  'セレクトバランス', 'アボダーム', 'ホリスティック・レセピー',
+  'iti', 'シシア', 'ナウフレッシュ', 'ファーストメイト',
+  'アカナ', 'オリジン', 'ハッピードッグ', 'ハッピーキャット',
+  'ベッツソリューション', 'ビオリオーブ', 'プロフェッショナル・バランス',
+  'シーバ', 'モンプチ', 'カルカン', 'ピュリナワン', 'アイムス',
+];
+
+const REQUIRED_LITTER_BRANDS = [
+  'ユニ・チャーム', '花王', 'アイリスオーヤマ', 'ライオン商事', 'ペティオ',
+  'マルカン', 'ドギーマン', '猫壱', 'リッチェル', 'ジェックス',
+];
+
+describe('CATALOG ブランドカバレッジ', () => {
+  it.each(REQUIRED_FOOD_BRANDS)('フードブランド "%s" が含まれている', (brand) => {
+    expect(CATALOG.some((x) => x.category === 'food' && x.brand === brand)).toBe(true);
+  });
+
+  it.each(REQUIRED_LITTER_BRANDS)('消耗品ブランド "%s" が含まれている', (brand) => {
+    expect(CATALOG.some((x) => x.category === 'litter' && x.brand === brand)).toBe(true);
+  });
+});
