@@ -6,6 +6,8 @@ import { EXPENSE_CATEGORIES, type ExpenseCategory, type Expense } from "../types
 import { CATEGORY_LABELS, CATEGORY_EMOJI, CONSUMABLE_CATEGORIES } from "../utils/constants";
 import { validateCreateExpense } from "../utils/validator";
 import ReminderSetting from "./ReminderSetting";
+import ProductSuggestions from "./ProductSuggestions";
+import type { CatalogCategory } from "../types/catalog";
 
 interface ExpenseFormProps {
   onSubmit: (data: {
@@ -136,6 +138,18 @@ export default function ExpenseForm({
         onChangeText={setItemName}
         placeholder="例: ロイヤルカナン インドア 2kg"
         className="mb-4 rounded-lg border border-gray-200 px-3 py-3"
+      />
+      <ProductSuggestions
+        query={itemName}
+        category={
+          !editTarget && (category === "food" || category === "litter")
+            ? (category as CatalogCategory)
+            : null
+        }
+        onSelect={(picked) => {
+          setItemName(picked.displayName);
+          setAmount(String(picked.amount));
+        }}
       />
 
       <Text className="mb-2 text-base font-medium text-gray-600">金額 (円)</Text>

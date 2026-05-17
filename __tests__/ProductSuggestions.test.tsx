@@ -57,3 +57,30 @@ describe('ProductSuggestions', () => {
     expect(queryByText(/デオトイレ/)).toBeNull();
   });
 });
+
+import ExpenseForm from '../components/ExpenseForm';
+
+describe('ExpenseForm × ProductSuggestions 統合', () => {
+  it('food カテゴリで品名を入力するとサジェストが表示される', () => {
+    const { getByPlaceholderText, getAllByText } = render(
+      <ExpenseForm onSubmit={async () => {}} />
+    );
+    const input = getByPlaceholderText(/ロイヤルカナン/);
+    fireEvent.changeText(input, 'ロイ');
+    expect(getAllByText(/ロイヤルカナン/).length).toBeGreaterThan(0);
+  });
+
+  it('編集モードではサジェストが表示されない（カタログにヒットする品名でもUI出さず）', () => {
+    const editTarget = {
+      id: 'x', category: 'food' as const, amount: 3800,
+      itemName: 'ロイヤルカナン インドア',
+      expenseDate: '2026-05-17', memo: '', inventoryId: null,
+      reminderDays: null, notificationId: null,
+      createdAt: '2026-05-17T00:00:00Z', updatedAt: '2026-05-17T00:00:00Z',
+    };
+    const { queryByText } = render(
+      <ExpenseForm onSubmit={async () => {}} editTarget={editTarget} />
+    );
+    expect(queryByText('ロイヤルカナン インドア 2kg')).toBeNull();
+  });
+});
