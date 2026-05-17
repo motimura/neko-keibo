@@ -49,6 +49,7 @@ neko-keibo/
 │   ├── InventoryEditModal.tsx  # 在庫詳細/編集モーダル
 │   ├── InventoryForm.tsx       # 在庫手動追加フォーム
 │   ├── ReminderSetting.tsx     # 通知周期設定コンポーネント
+│   ├── ProductSuggestions.tsx  # 品名サジェストUI
 │   └── ui/                     # 汎用UIコンポーネント
 ├── db/                         # データベース層
 │   ├── schema.ts               # テーブル定義 & マイグレーション
@@ -63,7 +64,8 @@ neko-keibo/
 ├── types/                      # 型定義
 │   ├── expense.ts
 │   ├── inventory.ts            # 在庫の型定義
-│   └── notification.ts         # 通知の型定義
+│   ├── notification.ts         # 通知の型定義
+│   └── catalog.ts              # 商品カタログの型定義
 ├── utils/                      # ユーティリティ
 │   ├── validator.ts            # バリデーション
 │   ├── constants.ts            # カテゴリ定義、色、絵文字、在庫ステータス定数
@@ -71,7 +73,9 @@ neko-keibo/
 │   ├── notifications.ts        # 通知スケジュール管理（expo-notifications）
 │   ├── id.ts                   # ID生成（expo-crypto UUID）
 │   ├── export.ts               # データエクスポート（JSON/CSV）
-│   └── import.ts               # データインポート（JSON/CSV）
+│   ├── import.ts               # データインポート（JSON/CSV）
+│   ├── catalogSearch.ts        # カタログ検索ロジック
+│   └── productCatalog.ts       # 静的商品カタログ
 ├── __tests__/                  # テスト
 ├── docs/                       # GitHub Pages（プライバシーポリシー公開用）
 │   └── index.md
@@ -257,6 +261,38 @@ CLAUDE.md が古いと Claude Code が誤った前提でコードを生成する
 - v2: React Native (Expo) + ローカルSQLite に方針転換
 - 理由: モバイルアプリとしてストア公開を見据え、ローカルファーストで運用コスト $0 を実現するため
 - v1の型定義・バリデーションロジック・カテゴリ定義は v2 に流用
+
+## 商品サジェスト機能
+
+### 概要
+
+支出登録時、フード・消耗品カテゴリでは品名入力欄の下に「品名 + 目安金額」のサジェストを最大8件表示する。タップで品名・金額を一括入力できる。
+
+### 対象カテゴリ
+
+- food（フード）
+- litter（消耗品）
+
+### データソース
+
+`utils/productCatalog.ts` に in-memory の静的配列で約500件規模のカタログを保持（初版は約100件）。SQLite は使わない。
+
+### 検索仕様
+
+- 入力を NFKC + lowercase + 空白除去で正規化
+- `searchKey.includes(query)` で部分一致
+- ソート: 前方一致 > 部分一致、brand 一致を次に、displayName 短い順
+- 最大8件返す
+- 編集モード（既存支出の編集中）はサジェストを表示しない（誤上書き防止）
+
+### 価格の扱い
+
+カタログの金額は市場相場ベースの目安値。実際の購入額とずれがある場合はタップ後に金額欄で編集可能。
+
+### カバレッジ
+
+- フード: プレミアム26ブランド + メインストリーム5ブランド
+- 消耗品: 上位10社（猫砂・ペットシーツ・お手入れシート・爪とぎ消耗品）
 
 ## 通知（リマインダー）仕様
 
