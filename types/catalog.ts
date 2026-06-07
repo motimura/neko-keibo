@@ -11,4 +11,6 @@ export interface CatalogItem {
   amount: number;
   displayName: string;
   searchKey: string;
+  suggestionLabel?: string;
+  inputName?: string;
 }

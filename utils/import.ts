@@ -10,6 +10,7 @@ import { generateId } from "./id";
 const LABEL_TO_CATEGORY: Record<string, ExpenseCategory> = Object.fromEntries(
   Object.entries(CATEGORY_LABELS).map(([k, v]) => [v, k as ExpenseCategory])
 );
+LABEL_TO_CATEGORY["猫砂"] = "litter";
 
 export type ImportMode = "overwrite" | "merge";
 

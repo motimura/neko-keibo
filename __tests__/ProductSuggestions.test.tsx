@@ -6,7 +6,23 @@ import { item } from '../utils/productCatalog';
 const TEST_CATALOG = [
   item('food', 'ロイヤルカナン', 'インドア', '2kg', 3800),
   item('food', 'ロイヤルカナン', '満腹感サポート', '2kg', 3500),
+  item('food', 'ロイヤルカナン', '詳細入力', '2kg', 4000, {
+    suggestionLabel: 'ロイヤルカナン 2kg（詳細を追記）',
+    inputName: 'ロイヤルカナン  2kg',
+  }),
+  item('food', 'ニュートロ', '詳細入力', '2kg', 3300, {
+    suggestionLabel: 'ニュートロ 2kg（詳細を追記）',
+    inputName: 'ニュートロ  2kg',
+  }),
+  item('food', 'ピュリナワン', '詳細入力', '2kg', 2100, {
+    suggestionLabel: 'ピュリナワン 2kg（詳細を追記）',
+    inputName: 'ピュリナワン  2kg',
+  }),
   item('litter', 'ユニ・チャーム', 'デオトイレ', '2L', 980),
+  item('litter', 'ユニ・チャーム', 'デオトイレ シート 詳細入力', '枚数未入力', 980, {
+    suggestionLabel: 'デオトイレ シート（枚数を追記）',
+    inputName: 'デオトイレ シート ',
+  }),
 ];
 
 describe('ProductSuggestions', () => {
@@ -30,6 +46,14 @@ describe('ProductSuggestions', () => {
     );
     expect(getByText('ロイヤルカナン インドア 2kg')).toBeTruthy();
     expect(getByText('¥3,800')).toBeTruthy();
+  });
+
+  it('suggestionLabel がある候補は表示ラベルを優先する', () => {
+    const { getByText, queryByText } = render(
+      <ProductSuggestions query="詳細" category="food" onSelect={() => {}} catalog={TEST_CATALOG} />
+    );
+    expect(getByText('ロイヤルカナン 2kg（詳細を追記）')).toBeTruthy();
+    expect(queryByText('ロイヤルカナン 詳細入力 2kg')).toBeNull();
   });
 
   it('該当なしなら "見つかりません" メッセージを表示する', () => {
@@ -82,5 +106,59 @@ describe('ExpenseForm × ProductSuggestions 統合', () => {
       <ExpenseForm onSubmit={async () => {}} editTarget={editTarget} />
     );
     expect(queryByText('ロイヤルカナン インドア 2kg')).toBeNull();
+  });
+
+  it('inputName がある候補を選ぶと品名欄には入力用テンプレートが入る', () => {
+    const { getByPlaceholderText, getByText } = render(
+      <ExpenseForm onSubmit={async () => {}} />
+    );
+    const input = getByPlaceholderText(/ロイヤルカナン/);
+    fireEvent.changeText(input, 'ロイヤルカナン');
+    fireEvent.press(getByText('ロイヤルカナン 2kg（詳細を追記）'));
+    expect(input.props.value).toBe('ロイヤルカナン  2kg');
+  });
+
+  it('inputName がある候補を選ぶと詳細追記位置にカーソルを置く', () => {
+    const { getByPlaceholderText, getByText } = render(
+      <ExpenseForm onSubmit={async () => {}} />
+    );
+    const input = getByPlaceholderText(/ロイヤルカナン/);
+    fireEvent.changeText(input, 'ロイヤルカナン');
+    fireEvent.press(getByText('ロイヤルカナン 2kg（詳細を追記）'));
+    expect(input.props.selection).toEqual({ start: 8, end: 8 });
+  });
+
+  it('ロイヤルカナン以外の容量テンプレートでも詳細追記位置にカーソルを置く', () => {
+    const { getByPlaceholderText, getByText } = render(
+      <ExpenseForm onSubmit={async () => {}} />
+    );
+    const input = getByPlaceholderText(/ロイヤルカナン/);
+    fireEvent.changeText(input, 'ニュートロ');
+    fireEvent.press(getByText('ニュートロ 2kg（詳細を追記）'));
+    expect(input.props.value).toBe('ニュートロ  2kg');
+    expect(input.props.selection).toEqual({ start: 6, end: 6 });
+  });
+
+  it('ピュリナワンの容量テンプレートでも詳細追記位置にカーソルを置く', () => {
+    const { getByPlaceholderText, getByText } = render(
+      <ExpenseForm onSubmit={async () => {}} />
+    );
+    const input = getByPlaceholderText(/ロイヤルカナン/);
+    fireEvent.changeText(input, 'ピュリナワン');
+    fireEvent.press(getByText('ピュリナワン 2kg（詳細を追記）'));
+    expect(input.props.value).toBe('ピュリナワン  2kg');
+    expect(input.props.selection).toEqual({ start: 7, end: 7 });
+  });
+
+  it('消耗品テンプレートでも追記位置にカーソルを置く', () => {
+    const { getByPlaceholderText, getByText } = render(
+      <ExpenseForm onSubmit={async () => {}} />
+    );
+    fireEvent.press(getByText('🧻 消耗品'));
+    const input = getByPlaceholderText(/ロイヤルカナン/);
+    fireEvent.changeText(input, 'デオトイレ');
+    fireEvent.press(getByText('デオトイレ シート（枚数を追記）'));
+    expect(input.props.value).toBe('デオトイレ シート ');
+    expect(input.props.selection).toEqual({ start: 10, end: 10 });
   });
 });

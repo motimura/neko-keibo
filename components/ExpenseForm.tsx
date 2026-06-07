@@ -3,7 +3,7 @@ import { View, Text, TextInput, Pressable, ScrollView, Alert, Switch } from "rea
 import { format } from "date-fns";
 import CalendarPicker from "./CalendarPicker";
 import { EXPENSE_CATEGORIES, type ExpenseCategory, type Expense } from "../types/expense";
-import { CATEGORY_LABELS, CATEGORY_EMOJI, CONSUMABLE_CATEGORIES } from "../utils/constants";
+import { CATEGORY_LABELS, CATEGORY_EMOJI } from "../utils/constants";
 import { validateCreateExpense } from "../utils/validator";
 import ReminderSetting from "./ReminderSetting";
 import ProductSuggestions from "./ProductSuggestions";
@@ -45,9 +45,11 @@ export default function ExpenseForm({
   onReminderDaysChange,
 }: ExpenseFormProps) {
   const scrollRef = useRef<ScrollView>(null);
+  const itemNameInputRef = useRef<TextInput>(null);
   const [category, setCategory] = useState<ExpenseCategory>("food");
   const [amount, setAmount] = useState("");
   const [itemName, setItemName] = useState("");
+  const [itemNameSelection, setItemNameSelection] = useState<{ start: number; end: number } | undefined>();
   const [expenseDate, setExpenseDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [memo, setMemo] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -70,6 +72,11 @@ export default function ExpenseForm({
   const handleCategoryChange = (cat: ExpenseCategory) => {
     setCategory(cat);
     onCategoryChange?.(cat);
+  };
+
+  const handleItemNameChange = (value: string) => {
+    setItemName(value);
+    setItemNameSelection(undefined);
   };
 
   const reset = () => {
@@ -109,7 +116,7 @@ export default function ExpenseForm({
   };
 
   return (
-    <ScrollView ref={scrollRef} className="flex-1 p-4" keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
+    <ScrollView ref={scrollRef} className="flex-1 p-4" keyboardShouldPersistTaps="always" keyboardDismissMode="on-drag">
       {editTarget && (
         <View className="mb-4 rounded-lg px-4 py-3" style={{ backgroundColor: '#FFF8E1' }}>
           <Text className="text-base font-bold text-amber-700">
@@ -134,8 +141,11 @@ export default function ExpenseForm({
 
       <Text className="mb-2 text-base font-medium text-gray-600">品名</Text>
       <TextInput
+        ref={itemNameInputRef}
         value={itemName}
-        onChangeText={setItemName}
+        onChangeText={handleItemNameChange}
+        selection={itemNameSelection}
+        onSelectionChange={(event) => setItemNameSelection(event.nativeEvent.selection)}
         placeholder="例: ロイヤルカナン インドア 2kg"
         className="mb-4 rounded-lg border border-gray-200 px-3 py-3"
       />
@@ -147,8 +157,16 @@ export default function ExpenseForm({
             : null
         }
         onSelect={(picked) => {
-          setItemName(picked.displayName);
+          const nextItemName = picked.inputName ?? picked.displayName;
+          const detailPosition = picked.inputName?.indexOf("  ");
+          const cursorPosition =
+            detailPosition !== undefined && detailPosition >= 0
+              ? detailPosition + 1
+              : nextItemName.length;
+          setItemName(nextItemName);
+          setItemNameSelection({ start: cursorPosition, end: cursorPosition });
           setAmount(String(picked.amount));
+          requestAnimationFrame(() => itemNameInputRef.current?.focus());
         }}
       />
 

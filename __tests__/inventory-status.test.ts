@@ -49,8 +49,14 @@ describe("refreshAllInventoryStatuses", () => {
   let db: SQLite.SQLiteDatabase;
 
   beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-03-01T00:00:00Z"));
     jest.clearAllMocks();
     db = SQLite.openDatabaseSync("test.db");
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it("JOINクエリでexpensesのreminder_daysを参照する", async () => {

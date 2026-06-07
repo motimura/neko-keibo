@@ -34,7 +34,7 @@ export default function ProductSuggestions({ query, category, onSelect, catalog 
           android_ripple={{ color: '#f3f4f6' }}
         >
           <Text className="flex-1 text-base text-gray-900" numberOfLines={1}>
-            {it.displayName}
+            {it.suggestionLabel ?? it.displayName}
           </Text>
           <Text className="ml-3 text-base font-medium text-gray-600">
             ¥{it.amount.toLocaleString('ja-JP')}
